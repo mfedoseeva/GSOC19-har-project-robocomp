@@ -31,11 +31,11 @@
  | Dataset Name | Link | # subjects | # classes | # views | # joints |  # total samples | Comments |
  | --- | --- | --- | --- | --- | --- | --- | --- |
  | SYSU | [link](http://isee.sysu.edu.cn/~hujianfang/ProjectJOULE.html) | 40 | 12 | ? | 20 | 480 | most probably single-view. relatively high num of subjects to classes |
- | NTU RGB-D | [link](https://github.com/shahroudy/NTURGB-D) [link2](http://rose1.ntu.edu.sg/Datasets/actionRecognition.asp) | 40 | 60 | 80 | 25 | 56680 | has to be requested |
- | CAD-60 |  [link](http://pr.cs.cornell.edu/humanactivities/data.php) | 4 | 12 | ? | 15 | 60 | most probably single-view. shot in 5 diff. environments |
- | UWA 3D Multiview II | [link](http://staffhome.ecm.uwa.edu.au/~00053650/databases.html) | 10 | 30 | 4 | ? | 1076 | most probably 20 joints. multi-view was captured by moving the camera and repeating the action, rather than filming one action from diff. cameras|
+ | NTU RGB-D | [link](https://github.com/shahroudy/NTURGB-D) [link2](http://rose1.ntu.edu.sg/Datasets/actionRecognition.asp) | 40 | 60 | 80 | 25 | 56680 | has to be requested. |
+ | CAD-60 |  [link](http://pr.cs.cornell.edu/humanactivities/data.php) | 4 | 12 | - | 15 | 60 | single-view. shot in 5 diff. environments |
+ | UWA 3D Multiview II | [link](http://staffhome.ecm.uwa.edu.au/~00053650/databases.html) | 10 | 30 | 4 | ? | 1076 | most probably 20 joints |
  | MSR Action3D | [link](https://www.uow.edu.au/~wanqing/#Datasets) | 10 | 20 | ? | 20 | 567 | most probably single-view |
- | J-HMDB | [link](http://jhmdb.is.tue.mpg.de/challenge/JHMDB/datasets) | - | 21 | - | 13 | 928 | collected from internet videos, including outdoor environments, but these 928 samples are at least all full body |
+ | J-HMDB | [link](http://jhmdb.is.tue.mpg.de/challenge/JHMDB/datasets) | - | 21 | - | 13 | 928 | collected from internet videos, including outdoor environments, but these 928 samples are at least all full body. Joints were manually annotated |
  | SBU Kinect | [link](https://www3.cs.stonybrook.edu/~kyun/research/kinect_interaction/index.html) | 7 | 8 | ? | 15 | 300 | entirely **2 person** interaction dataset |
  | PKU-MMD | [link](http://www.icst.pku.edu.cn/struct/Projects/PKUMMD.html) | 66 | 51 | 3 | 25 | 1076 | one video is 2-3 mins and contains sequence of different activities |
 
@@ -44,7 +44,11 @@
 ## Questions for the 1st Meeting
 
 1. what is our use case scenario:  
-	what is input of the user? rgb video, rgbd video, extracted poses. 
-2. are there any special requirements regarding the tools, libraries, environment, etc. 
- 
+	what is input of the user? rgb video, rgbd video, extracted poses.  
+	Answer: focus on skeleton. later use depth, rgb. 
+2. are there any special requirements regarding the tools, libraries, environment, etc.  <-- postpone question
+3. should I implement in python 2. can the inference be in py2 and training pipeline in py3.  
+	Answer:  python 3 works in robocomp
+4. reuse openpose component? <- postpone question, not relevant now
+
 
