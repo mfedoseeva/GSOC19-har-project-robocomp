@@ -55,10 +55,9 @@ def gendata(data_path,
             ignored_sample_path=None,
             ):
 
-    # no label or video for these samples
-    ignored_samples = ['0512164333', '0510171947', '0511125626', '0512160049']
-    # we do not count still and random samples
-    ignored_samples.append['0512172825', '0512174930', '0510160858', '0510165514', '0511121410', '0511125200', '0512150222', '0512154740']
+    # no label or video for four samples and we do not count still and random samples
+    ignored_samples = ['0512164333', '0510171947', '0511125626', '0512160049',
+     '0512172825', '0512174930', '0510160858', '0510165514', '0511121410', '0511125200', '0512150222', '0512154740']
     
     sample_name = []
     sample_label = []

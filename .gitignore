@@ -1,6 +1,16 @@
 
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
+
+### JupyterNotebook ###
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+# ignore jup notebooks as well
+*.ipynb
+
+# Remove previous ipynb_checkpoints
+#   git rm -r .ipynb_checkpoints/
+#
 	
 data0
 ### Python ###
