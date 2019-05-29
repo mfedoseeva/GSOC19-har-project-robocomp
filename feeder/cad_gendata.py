@@ -18,20 +18,18 @@ training_subjects = [1, 2, 3, 4]
 
 # labels in the dataset are strings, we need to convert them to numbers
 activities = {
-    'still' : 0,
-    'talking on the phone' : 1,
-    'writing on whiteboard': 2,
-    'drinking water': 3,
-    'rinsing mouth with water' : 4, 
-    'brushing teeth' : 5,
-    'wearing contact lenses' : 6,
-    'talking on couch' : 7,
-    'relaxing on couch' : 8,
-    'cooking (chopping)' : 9,
-    'cooking (stirring)' : 10,
-    'opening pill container' : 11,
-    'working on computer' : 12,
-    'random' : 13,
+    'talking on the phone' : 0,
+    'writing on whiteboard': 1,
+    'drinking water': 2,
+    'rinsing mouth with water' : 3, 
+    'brushing teeth' : 4,
+    'wearing contact lenses' : 5,
+    'talking on couch' : 6,
+    'relaxing on couch' : 7,
+    'cooking (chopping)' : 8,
+    'cooking (stirring)' : 9,
+    'opening pill container' : 10,
+    'working on computer' : 11,
 }
 
 
@@ -59,6 +57,8 @@ def gendata(data_path,
 
     # no label or video for these samples
     ignored_samples = ['0512164333', '0510171947', '0511125626', '0512160049']
+    # we do not count still and random samples
+    ignored_samples.append['0512172825', '0512174930', '0510160858', '0510165514', '0511121410', '0511125200', '0512150222', '0512154740']
     
     sample_name = []
     sample_label = []
