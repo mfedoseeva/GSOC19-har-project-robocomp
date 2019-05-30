@@ -1,6 +1,6 @@
 # Development of Human Activity Recognition Component
 
-**This is works in progress**
+**This is work in progress**
 
 ## Preliminary Milestones
 
