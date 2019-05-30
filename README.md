@@ -1,10 +1,11 @@
 # Development of Human Activity Recognition Component
 
+**This is works in progress**
 
 ## Preliminary Milestones
 
 - [ ] Community bonding: research the solution, get in touch with mentors, sync the goals and brush up the plan, clarify any requirements regarding the tools
-- [ ] First iteration of the classification model, training pipeline and robocomp component
+- [ ] First iteration of the classification model, data processing and overall training pipeline
 - [ ] Improvement of the model, qualitative and quantitative evaluations on the target dataset(s)
 - [ ] Finalization and integration of the component, fixing any issues acc. to feedback, testing and documentation
 
