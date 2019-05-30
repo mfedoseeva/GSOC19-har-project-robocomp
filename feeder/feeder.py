@@ -12,29 +12,26 @@ class Feeder():
     Arguments:
         data_path: the path to '.npy' data, the shape of data should be (N, C, T, V)
         label_path: the path to label
-        normalization: If true, normalize input sequence
+        center: If true, center at torso
     """
 
     def __init__(self,
                  data_path,
                  label_path,
                  num_frame_path,
-                 normalization=False,
+                 center=False,
                  mmap=False,
                  max_body = 1
                  ):
         self.data_path = data_path
         self.label_path = label_path
         self.num_frame_path = num_frame_path
-        self.normalization = normalization
+        self.center = center
         self.mmap = mmap
         self.max_body = max_body
 
         self.load_data()
-        if normalization:
-            # not implemented
-            pass
-
+        
     def load_data(self):
         # data: N C V T 
 
@@ -60,11 +57,11 @@ class Feeder():
         # load num of valid frame length
         self.valid_frame_num = np.load(self.num_frame_path)
 
-        # N - sample, C - xyz, T - frame, V - joint, M - body 
+        # N - sample, C - xyz, T - frame, V - joint
         if self.max_body == 1 :
             self.N, self.C, self.T, self.V = self.data.shape
         else :
-            raise NameError('multiperson not implemented')
+            raise NotImplementedError('multiperson not implemented')
 
 
     def __len__(self):
@@ -77,12 +74,20 @@ class Feeder():
         # get data
         # input: C, T, V
         data_numpy = self.data[index]
-        # if self.mmap = True, the loaded data_numpy is read-only, and torch.utils.data.DataLoader could load type 'numpy.core.memmap.memmap'
+       
         if self.mmap:
             data_numpy = np.array(data_numpy) # convert numpy.core.memmap.memmap to numpy
 
+
         label = self.label[index]
         valid_frame_num = self.valid_frame_num[index]
+
+        if self.center:
+            for t in range(valid_frame_num):
+                # coords of the torso
+                torso_coord = data_numpy[:, t, 2]
+                    for v in range(self.V):
+                        data_numpy[:, t, v] -= torso_coord
 
         return data_numpy, label
 

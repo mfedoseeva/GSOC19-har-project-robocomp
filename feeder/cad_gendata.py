@@ -87,7 +87,7 @@ def gendata(data_path,
                     if sample_id == cont[0]:
                         action_label = activities[cont[1]]
                 if action_label == -1:
-                    raise NameError('cannot find activity label for a sample')
+                    raise ValueError('cannot find activity label for a sample')
 
             istraining = (s + 1 in training_subjects)
 
