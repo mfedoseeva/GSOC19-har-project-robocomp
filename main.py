@@ -4,6 +4,10 @@ import os
 import random
 import numpy as np
 
+# for SVM
+from sklearn import svm
+from sklearn.model_selection import cross_val_score
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_dir', default='/data0/', help="directory of the dataset")
 
@@ -34,7 +38,7 @@ def fetch_data(params):
     else:
         raise NotImplementedError('only CAD-60 is supported')
 
-def custom_cv(data):
+def custom_cv_subj(data):
     # custom cross-validation rule, each fold = 1 subject
     n = data.N
     subjects = 4
@@ -78,13 +82,17 @@ if __name__ == '__main__':
     np.random.seed(params.seed)
     random.seed(params.seed)
 
+    # get the data
+    dataset = fetch_data(params)
+    data = dataset.data
+    labels = dataset.labels
 
     # instantiate nodel object, ** unpacks key-value pairs to the function
 
-    if 'CAD' in params.model_version:
-        model = model.model(**params.model_args)
+    clf = svm.SVC(kernel='linear', decision_function_shape='ovo')
+    custom_cv = custom_cv_subj()
+    scores = cross_val_score(clf, data, labels, cv=custom_cv)
 
-        loss_fn = model.loss_fn
 
     # load train data
 
