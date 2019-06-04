@@ -82,12 +82,12 @@ class Feeder():
         label = self.label[index]
         valid_frame_num = self.valid_frame_num[index]
 
-        if self.center:
+        if self.center == True:
             for t in range(valid_frame_num):
                 # coords of the torso
                 torso_coord = data_numpy[:, t, 2]
-                    for v in range(self.V):
-                        data_numpy[:, t, v] -= torso_coord
+                for v in range(self.V):
+                    data_numpy[:, t, v] -= torso_coord
 
         return data_numpy, label
 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     
 
     dataset = Feeder(data_path, label_path, num_frame_path,
-                     normalization=False
+                     center=False
                      )
 
     print('Labels distribution')

@@ -23,6 +23,27 @@ parser.add_argument('--mode', default='train', help='train,test,or load_train')
 parser.add_argument('--num', default='01', help='num of trials (type: list)')
 
 
+def fetch_data(params):
+    # creates and returns feedr object with data
+    if 'CAD-60' in params.dataset_name:
+        params.data_feeder_args["data_path"] = params.dataset_dir+'/CAD-60'+'/train_data.npy'
+        params.data_feeder_args["num_frame_path"] = params.dataset_dir+'/CAD-60'+'/train_num_frame.npy'
+        params.data_feeder_args["label_path"] = params.dataset_dir + '/CAD-60' + '/train_label.pkl'
+        dataset = Feeder(**params.data_feeder_args)
+        return dataset
+    else:
+        raise NotImplementedError('only CAD-60 is supported')
+
+def custom_cv(data):
+    # custom cross-validation rule, each fold = 1 subject
+    n = data.N
+    subjects = 4
+    actions = 15
+    for i in range(subjects):
+        train_idx = np.arange(i * actions, i * actions + actions)
+        val_idx = x for x in range(subjects * actions) if x not in train_idx
+        yield train_idx, val_idx
+
 
 if __name__ == '__main__':
     # Load the parameters from json file
