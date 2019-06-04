@@ -19,14 +19,14 @@ class Feeder():
                  data_path,
                  label_path,
                  num_frame_path,
-                 center=False,
+                 #center=False,
                  mmap=False,
                  max_body = 1
                  ):
         self.data_path = data_path
         self.label_path = label_path
         self.num_frame_path = num_frame_path
-        self.center = center
+        #self.center = center
         self.mmap = mmap
         self.max_body = max_body
 
@@ -79,15 +79,15 @@ class Feeder():
             data_numpy = np.array(data_numpy) # convert numpy.core.memmap.memmap to numpy
 
 
-        label = self.label[index]
-        valid_frame_num = self.valid_frame_num[index]
+        # label = self.label[index]
+        # valid_frame_num = self.valid_frame_num[index]
 
-        if self.center == True:
-            for t in range(valid_frame_num):
-                # coords of the torso
-                torso_coord = data_numpy[:, t, 2]
-                for v in range(self.V):
-                    data_numpy[:, t, v] -= torso_coord
+        # if self.center == True:
+        #     for t in range(valid_frame_num):
+        #         # coords of the torso
+        #         torso_coord = data_numpy[:, t, 2]
+        #         for v in range(self.V):
+        #             data_numpy[:, t, v] -= torso_coord
 
         return data_numpy, label
 

@@ -48,6 +48,14 @@ def print_toolbar(rate, annotation=''):
 def end_toolbar():
     sys.stdout.write("\n")
 
+def gen_features(data):
+    # xyz, frame, joint
+    C, V, T = data.shape
+
+    # do something
+
+    return data
+
 
 def gendata(data_path,
             out_path,
@@ -103,7 +111,10 @@ def gendata(data_path,
             if issample:
                 sample_name.append(sample_path)
                 sample_label.append(action_label)
-                sample_data.append(read_xyz((data_path + sample_path), max_body=max_body, num_joint=num_joint))
+                # xyz, frame, joint
+                data = read_xyz((data_path + sample_path), max_body=max_body, num_joint=num_joint)
+                features = gen_features(data)
+                sample_data.append(features)
 
     with open('{}/{}_label.pkl'.format(out_path, part), 'wb') as f:
         pickle.dump((sample_name, list(sample_label)), f)
