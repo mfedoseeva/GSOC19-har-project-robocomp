@@ -17,18 +17,18 @@ parser.add_argument('--model_dir', default='./',
                     help="parents directory of model")
 
 parser.add_argument('--model_name', default='SVM',help="model name")
-parser.add_argument('--load_model',
-        help='Optional, load trained models')
-parser.add_argument('--load',
-        type=str2bool,
-        default=False,
-        help='load a trained model or not ')
+# parser.add_argument('--load_model',
+#         help='Optional, load trained models')
+# parser.add_argument('--load',
+#         type=str2bool,
+#         default=False,
+#         help='load a trained model or not ')
 parser.add_argument('--mode', default='train', help='train,test,or load_train')
 parser.add_argument('--num', default='01', help='num of trials (type: list)')
 
 
 def fetch_data(params):
-    # creates and returns feedr object with data
+    # creates and returns feeder object with data
     if 'CAD-60' in params.dataset_name:
         params.data_feeder_args["data_path"] = params.dataset_dir+'/CAD-60'+'/train_data.npy'
         params.data_feeder_args["num_frame_path"] = params.dataset_dir+'/CAD-60'+'/train_num_frame.npy'
@@ -47,6 +47,40 @@ def custom_cv_subj(data):
         train_idx = np.arange(i * actions, i * actions + actions)
         val_idx = x for x in range(subjects * actions) if x not in train_idx
         yield train_idx, val_idx
+
+# work in progress, not used for now
+def gen_features(data):
+    # xyz, frame, joint
+    C, T, V = data.shape
+    frames_selected = [5, 9, 14, 20, 27, 35, 44, 54, 65]
+
+    # center at torso
+    for t in range(T):
+        # coords of the torso
+        torso_coord = data[:, t, 2]
+        for v in range(V):
+        data_numpy[:, t, v] -= torso_coord
+
+    # removing one dimension
+    twodim_table = []
+    for c in range(C):
+        jointframe = []
+        for t in range(T):
+            if t in frames_selected:
+                coords = []
+                for v in range(V):
+                    if v == 2:
+                        continue
+                    coords.append(data[c, t, v])
+                np.hstack(jointframe, coords)
+        twodim_table[c] = jointframe
+
+    # removing another dimension
+    onedim_table = []
+    for i in  
+    dist_euclid = np.linalg.norm(data[:. t, v])
+                    distances.append(dist_euclid)
+    return data
 
 
 if __name__ == '__main__':
@@ -75,8 +109,8 @@ if __name__ == '__main__':
     params.mode = args.mode
 
     # specified in json
-    if params.gpu_id >= -1:
-        params.cuda = True
+    # if params.gpu_id >= -1:
+    #     params.cuda = True
 
     # Set the random seed for reproducible experiments
     np.random.seed(params.seed)
@@ -87,12 +121,10 @@ if __name__ == '__main__':
     data = dataset.data
     labels = dataset.labels
 
-    # instantiate nodel object, ** unpacks key-value pairs to the function
-
     clf = svm.SVC(kernel='linear', decision_function_shape='ovo')
     custom_cv = custom_cv_subj()
     scores = cross_val_score(clf, data, labels, cv=custom_cv)
-
+    print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
     # load train data
 

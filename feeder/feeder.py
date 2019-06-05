@@ -79,7 +79,7 @@ class Feeder():
             data_numpy = np.array(data_numpy) # convert numpy.core.memmap.memmap to numpy
 
 
-        # label = self.label[index]
+        label = self.label[index]
         # valid_frame_num = self.valid_frame_num[index]
 
         # if self.center == True:
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     
 
     dataset = Feeder(data_path, label_path, num_frame_path,
-                     center=False
+                     #center=False
                      )
 
     print('Labels distribution')
