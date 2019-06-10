@@ -86,6 +86,7 @@ if __name__ == '__main__':
     dataset = fetch_data(params)
     X = dataset.data
     Y = dataset.labels
+    num_frames = dataset.valid_frame_num
 
     clf = svm.SVC(kernel='linear', decision_function_shape='ovo')
     custom_cv = custom_cv_subj()
