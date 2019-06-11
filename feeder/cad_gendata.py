@@ -53,6 +53,7 @@ def end_toolbar():
 def gendata(data_path,
             out_path,
             part,
+            env,
             ignored_sample_path=None,
             ):
 
@@ -63,6 +64,13 @@ def gendata(data_path,
     sample_name = []
     sample_label = []
     sample_data = []
+
+    data_path = os.path.join(data_path, e)
+    out_path = os.path.join(out_path, e)
+
+    os.makedirs(out_path, exist_ok=True)
+    print(data_path)
+    print(out_path)
 
     for s in range(subjects):
 
@@ -78,9 +86,8 @@ def gendata(data_path,
                 continue
 
             action_label = -1 
-            with open(data_path_s + '/activityLabel.txt', 'r') as f:
-                # last line is END
-                num_lines = len(f.readlines()) - 1
+            with open('../support_operations/total_labels.txt', 'r') as f:
+                num_lines = len(f.readlines())
                 f.seek(0)
                 for i in range(num_lines):
                     line = f.readline() 
@@ -112,7 +119,8 @@ def gendata(data_path,
 
     # https://docs.scipy.org/doc/numpy/reference/generated/numpy.memmap.html
     # https://blog.csdn.net/u014630431/article/details/72844501
-
+    print(env)
+    print(len(sample_name))
     # in fp the data itself is stored
     fp = open_memmap(
         '{}/{}_data.npy'.format(out_path, part),
@@ -141,19 +149,23 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='CAD-60 Data Converter.')
     parser.add_argument(
-        '--data_path', default='../../cad60dataset')
+        '--data_path', default='../../cad60_separated')
     parser.add_argument('--out_folder', default='../data0/CAD-60')
 
-    # everything is train data, because we will be doing cross-validation
+    # everything is train data, because we will be doing cross-validation, can extend this for train-test split simply by adding 'test' to the list
     part = ['train']
+
+    environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
     arg = parser.parse_args()
 
 
     for p in part:
-        out_path = arg.out_folder
-        if not os.path.exists(out_path):
-            os.makedirs(out_path)
-        gendata(
-            arg.data_path,
-            out_path,
-            part=p)
+        for e in environments:
+            out_path = arg.out_folder
+            if not os.path.exists(out_path):
+                os.makedirs(out_path)
+            gendata(
+                arg.data_path,
+                out_path,
+                part=p,
+                env=e)

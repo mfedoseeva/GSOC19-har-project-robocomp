@@ -6,6 +6,7 @@ import pickle
 # import torch.utils.data
 
 import numpy as np
+import os
 
 class Feeder():
     """ Feeder for skeleton-based action recognition
@@ -98,30 +99,45 @@ if __name__ == '__main__':
     import numpy as np
 
     # testing
-    data_path = "../data0/CAD-60/train_data.npy"
-    label_path = "../data0/CAD-60/train_label.pkl"
-    num_frame_path = "../data0/CAD-60/train_num_frame.npy"
+    base_path = "../data0/CAD-60"
+    environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
+    data_file = "train_data.npy"
+    label_file = "train_label.pkl"
+    num_frame_file = "train_num_frame.npy"
     
+    for env in environments:
 
-    dataset = Feeder(data_path, label_path, num_frame_path,
-                     #center=False
-                     )
+        print(f"Environment: {env}")
 
-    print('Labels distribution')
-    print(np.bincount(dataset.label))
+        data_path = os.path.join(base_path, env, data_file)
+        label_path = os.path.join(base_path, env, label_file)
+        num_frame_path = os.path.join(base_path, env, num_frame_file)
 
-    # only print for small datasets
-    for i, j in zip(dataset.sample_name, dataset.label):
-        print(str(i) + ' | ' + str(j))
+        dataset = Feeder(data_path, label_path, num_frame_path,
+                         #center=False
+                         )
 
-    print('Num of frames in samples: ')
-    print(dataset.valid_frame_num)
+        print('Labels distribution: ')
+        oneh_vector = np.zeros(12)
+        bins = np.bincount(dataset.label)
+        for i in range(len(bins)):
+            oneh_vector[i] = bins[i] 
+        print(oneh_vector)
 
-    print('Samples statistics')
-    print(f"{dataset.N} samples")
-    print(f"{dataset.C} coords")
-    print(f"{np.mean(dataset.valid_frame_num):.2f} average frames") 
-    print(f"{dataset.V} joints")
+        # only print for small datasets
+        for i, j in zip(dataset.sample_name, dataset.label):
+            print(str(i) + ' | ' + str(j))
+
+        print('Num of frames in samples: ')
+        print(dataset.valid_frame_num)
+
+        print('Samples statistics: ')
+        print(f"{dataset.N} samples")
+        print(f"{dataset.C} coords")
+        print(f"{np.mean(dataset.valid_frame_num):.2f} average frames") 
+        print(f"{dataset.V} joints")
+
+        print ('------------------')
 
 
 

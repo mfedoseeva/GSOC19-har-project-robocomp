@@ -85,8 +85,8 @@ def read_xyz(file, max_body=1, num_joint=15):
 if __name__ == '__main__':
     
     # 1 skeleton test
-    data_path = '../../../cad60dataset/data1/'
-    test_skeleton = '0512174930.txt' 
+    data_path = '../../cad60_separated/office/data1'
+    test_skeleton = '0512175502.txt' 
 
     data = read_xyz(os.path.join(data_path, test_skeleton))
     print(data)
