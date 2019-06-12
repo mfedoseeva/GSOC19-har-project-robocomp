@@ -8,6 +8,7 @@
 # ignore jup notebooks as well
 /test.ipynb
 /support_operations/data_separation.ipynb
+/feature_extraction/testing_features1.ipynb
 
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
