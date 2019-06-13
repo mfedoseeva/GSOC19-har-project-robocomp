@@ -91,18 +91,6 @@ def dist_to_joint_single(joint1, joint2):
     '''
     return np.linalg.norm(joint1 - joint2)
 
-def flatten(X, valid_frame_num):
-    '''
-    turn two-dim data into one-dim data by stacking
-    in_shape = (num_frames, features)
-    out_shape = (valid_frames*features)
-    '''
-    _, V = X.shape
-    data = np.zeros(valid_frame_num * V)
-    for i in range(valid_frame_num):
-        data[i*valid_frame_num : i*valid_frame_num + valid_frame_num] = X[i]
-    return data
-
 
 def horizontal_flip(X, valid_frame_num):
     '''
@@ -144,6 +132,46 @@ def diff_position_y(X, num_frames):
         for t in range(num_frames[i]):
             out[i, t] = X[i, 1, t] - init_y
     return out
+
+
+def frame_by_frame_samples(X, valid_frame_num):
+    '''
+    turns every frame into a sample
+    in_shape (n_samples, features, n_frames)
+    out_shape (n_samples * valid_frame_num, features)
+    '''
+    N, F, _ = X.shape
+    total_samples = sum(valid_frame_num)*N
+    X_new = np.zeros((total_samples, F))
+    for i in range(N):
+        for j in range(valid_frame_num[i]):
+            X_new[i*j + j] = X[i, :, j]
+    return X_new
+
+def frame_by_frame_labels(labels, valid_frame_num):
+    '''
+    produces labels for each frame
+    in-len = 60
+    out_len = 60 * valid_frame_num
+    '''
+    new_labels = []
+    for i in range(len(labels)):
+        for j in range(valid_frame_num[i]):
+            new_labels.append(labels[i])
+    return new_labels
+
+
+def flatten(X, valid_frame_num):
+    '''
+    turn two-dim data into one-dim data by stacking
+    in_shape = (num_frames, features)
+    out_shape = (valid_frames*features)
+    '''
+    _, V = X.shape
+    data = np.zeros(valid_frame_num * V)
+    for i in range(valid_frame_num):
+        data[i*valid_frame_num : i*valid_frame_num + valid_frame_num] = X[i]
+    return data
 
 
 # def cut_sample(X, valid_frame_num, length):
