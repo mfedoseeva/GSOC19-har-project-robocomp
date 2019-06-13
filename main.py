@@ -38,7 +38,7 @@ def fetch_data(params):
     else:
         raise NotImplementedError('only CAD-60 is supported')
 
-def custom_cv_subj(valid_frame_num, subjects=4, actions=15):
+def custom_cv_subj_fbf(valid_frame_num, subjects=4, actions=15):
     # custom cross-validation rule, each fold = 1 subject
     n = len(valid_frame_num)
     
@@ -62,6 +62,17 @@ def custom_cv_subj(valid_frame_num, subjects=4, actions=15):
         train_idx = x for x in range(sum(valid_frame_num)) if x not in val_idx
         yield train_idx, val_idx
 
+def custom_cv_subj(data):
+    # custom cross-validation rule, each fold = 1 subject
+    n = data.N
+    subjects = 4
+    # some actions are performed several times
+    actions = 15
+    for i in range(subjects):
+        val_idx = np.arange(i * actions, i * actions + actions)
+        train_idx = x for x in range(subjects * actions) if x not in val_idx
+        yield train_idx, val_idx
+        
 
 if __name__ == '__main__':
     # Load the parameters from json file
