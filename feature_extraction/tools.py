@@ -13,6 +13,24 @@ def normalize(X, valid_frame_num):
             out[i, f, :] = X[i, f, :] * (1/max_feat)
     return out
 
+def normalize_by_height(feature, X, valid_frame_num):
+    '''
+    normalize a (distance) feature by the "height" of a person in the frame, where height is calc. as dist(foot, knee) + dist(knee, hip) + dist(torso, neck) +
+    dist(neck, head)
+    feature.shape = (N, n_frame)
+    '''
+    N, C, T, V = X.shape
+    normed_feature = np.zeros((feature.shape))
+    for i in range(N):
+        for t in range(valid_frame_num[i]):
+            foot_knee = dist_to_torso_singleframe(X[i, :, t, 13], X[i, :, t, 8])
+            knee_hip = dist_to_torso_singleframe(X[i, :, t, 8], X[i, :, t, 7])
+            torso_neck = dist_to_torso_singleframe(X[i, :, t, 2], X[i, :, t, 1])
+            neck_head = dist_to_torso_singleframe(X[i, :, t, 1], X[i, :, t, 0])
+            height = foot_knee + knee_hip + torso_neck + neck_head
+            normed_feature[i, t] = feature[i, t] / height
+    return normed_feature
+
 def center(X, valid_frame_num):
     '''
     origin is moved to torso coordinates for each frame.
@@ -141,18 +159,20 @@ def frame_by_frame_samples(X, valid_frame_num):
     out_shape (n_samples * valid_frame_num, features)
     '''
     N, F, _ = X.shape
-    total_samples = sum(valid_frame_num)*N
+    total_samples = sum(valid_frame_num)
     X_new = np.zeros((total_samples, F))
+    prev = 0
     for i in range(N):
         for j in range(valid_frame_num[i]):
-            X_new[i*j + j] = X[i, :, j]
+            X_new[prev + j] = X[i, :, j]
+        prev += valid_frame_num[i]
     return X_new
 
 def frame_by_frame_labels(labels, valid_frame_num):
     '''
     produces labels for each frame
-    in-len = 60
-    out_len = 60 * valid_frame_num
+    in-len = n_samples
+    out_len = n_samples * valid_frame_num
     '''
     new_labels = []
     for i in range(len(labels)):

@@ -13,10 +13,12 @@ class Params():
     ```
     """
 
-    def __init__(self, json_path):
-        with open(json_path) as f:
-            params = json.load(f)
-            self.__dict__.update(params)
+    # def __init__(self, json_path):
+    #     with open(json_path) as f:
+    #         params = json.load(f)
+    #         self.__dict__.update(params)
+    def __init__(self):
+        self.data_feeder_args = {}
 
     def save(self, json_path):
         with open(json_path, 'w') as f:
