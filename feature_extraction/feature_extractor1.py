@@ -1,4 +1,5 @@
 from feature_extraction import tools
+# import tools
 import numpy as np
 
 def extract_features_type1(X, num_frames):
@@ -8,7 +9,8 @@ def extract_features_type1(X, num_frames):
 	distance based features for (two hands and head), (two hands), (shoulders and feet), (hit and feet)
 	temporal positional features for hands, elbows and head
 	normalizes the data and rounds
-	'''
+	out_shape (N, 14. n_frames)
+	''' 
 	# N - samples, C - xyz, T - frames(all 2K for now, use num_frames to get actual length of a sample), V - joints 
 	N, C, T, V = X.shape
 	# center all data first

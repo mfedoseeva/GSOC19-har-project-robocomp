@@ -9,7 +9,7 @@ def normalize(X, valid_frame_num):
     out = np.zeros((N, feat, T))
     for i in range(N):
         for f in range(feat):
-            max_feat = np.max(X[i, f, :])
+            max_feat = np.max(np.absolute(X[i, f, :]))
             out[i, f, :] = X[i, f, :] * (1/max_feat)
     return out
 
@@ -156,7 +156,7 @@ def frame_by_frame_samples(X, valid_frame_num):
     '''
     turns every frame into a sample
     in_shape (n_samples, features, n_frames)
-    out_shape (n_samples * valid_frame_num, features)
+    out_shape (sum(valid_frame_num), features)
     '''
     N, F, _ = X.shape
     total_samples = sum(valid_frame_num)
@@ -172,7 +172,7 @@ def frame_by_frame_labels(labels, valid_frame_num):
     '''
     produces labels for each frame
     in-len = n_samples
-    out_len = n_samples * valid_frame_num
+    out_len = sum(valid_frame_num)
     '''
     new_labels = []
     for i in range(len(labels)):
