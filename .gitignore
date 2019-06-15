@@ -10,6 +10,7 @@
 /support_operations/data_separation.ipynb
 /feature_extraction/testing_features1.ipynb
 
+*.png
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 #
