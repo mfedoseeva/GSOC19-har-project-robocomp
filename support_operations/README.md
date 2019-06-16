@@ -12,13 +12,10 @@ To seperate the data into separate directories according to the environment grou
 running the following command will create 5 directories for each environment. inside of each environment there will be 4 directories for each subject. skeleton files will be distributed accordingly. common label map will be saved at the root of the directory where the seperated dataset is stored.
 
 ```commandline
-python data_separation_script.py
+python support_operations/data_separation_script.py --dataset_dir folder_with_original_data --separated_dataset_dir target_folder
 ```  
 
-the following lines need to be modified according to your needs in data_seperation_script.py:
+for example:
+```commandline
+python support_operations/data_separation_script.py --dataset_dir ../cad60dataset --separated_dataset_dir ../separated_cad60
 ```
-cad60_path = '../../cad60dataset'
-cad60_separated_path = '../../cad60_separated'
-```
-cad60_path should be the path where the original dataset lies.
-cad60_seperated_path should be the directory where the separated dataset should be placed
