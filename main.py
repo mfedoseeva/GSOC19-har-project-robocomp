@@ -120,9 +120,7 @@ if __name__ == '__main__':
         for i in range(len(bins)):
             oneh_vector[i] = bins[i] 
         print(oneh_vector)
-
-        # define model
-        clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
+ 
 
         if params.evaluation == 'cv' or 'full':
             # runs cross validation and outputs accuracy
@@ -135,6 +133,7 @@ if __name__ == '__main__':
             print("Mean Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
         if params.evaluation == 'full':
             # produces confusion matrices
+            clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
             pred_labels = np.empty(len(Y), dtype=int)
             correct_labels = np.empty(len(Y), dtype=int)
             custom_cv = custom_cv_subj_fbf(num_frames)
