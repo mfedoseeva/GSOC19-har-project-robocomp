@@ -14,6 +14,9 @@
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 #
+
+/evaluation.txt
+/models
 	
 data0
 ### Python ###

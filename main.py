@@ -7,6 +7,7 @@ from feature_extraction.tools import *
 from feeder.feeder import Feeder
 from feeder import utils
 from support_operations.plot_confusion_matrix import plot_confusion_matrix
+import pickle
 
 # for SVM
 from sklearn import svm
@@ -38,7 +39,7 @@ def fetch_data(params):
 
 def custom_cv_subj_fbf(valid_frame_num, subjects=_SUBJECTS):
     ''' 
-    custom cross-validation rule, each fold = 1 subject
+    custom cross-validation rule, each fold = 1 subject. Frame by Frame classification
     '''
     n = len(valid_frame_num)
     actions = n/subjects
@@ -76,6 +77,10 @@ def custom_cv_subj(data):
         train_idx = [x for x in range(subjects * actions) if x not in val_idx]
         yield train_idx, val_idx
 
+def save_model(clf, environment):
+    os.makedirs('./models', exist_ok=True)
+    with open('./models/{}_final_model.pkl'.format(environment), 'wb') as f:
+        pickle.dump(clf, f)
 
 if __name__ == '__main__':
     # Load the parameters from json file
@@ -140,15 +145,13 @@ if __name__ == '__main__':
                 X_test = X[test_idx]
                 Y_train = np.array(Y)[train_idx]
                 Y_test = np.array(Y)[test_idx]
-                
                 Y_pred = clf.fit(X_train, Y_train).predict(X_test)
                 pred_len = len(Y_pred)
                 pred_labels[prev : (prev + pred_len)] = Y_pred
                 correct_labels[prev : (prev + pred_len)] = Y_test
                 prev = prev + pred_len
+            save_model(clf, env)
             np.set_printoptions(precision=2)
             plot_confusion_matrix(correct_labels, pred_labels, classes=np.array(_CLASS_NAMES), normalize=True, title=env)
-        else:
-            raise ValueError('wrong evluation parameter passed')
 
 
