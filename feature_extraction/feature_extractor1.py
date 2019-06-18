@@ -46,7 +46,7 @@ def extract_features_type1(X, num_frames):
 	features[:, 12, :] = tools.diff_position_x(X[:, :, :, 0], num_frames)
 	features[:, 13, :] = tools.diff_position_y(X[:, :, :, 0], num_frames)
 	# normalize and round
-	features = tools.normalize(features, num_frames)
+	# features = tools.normalize(features, num_frames)
 	features = np.around(features, decimals=3)
 
 	return features

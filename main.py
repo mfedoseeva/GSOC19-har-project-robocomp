@@ -77,6 +77,13 @@ def custom_cv_subj(data):
         train_idx = [x for x in range(subjects * actions) if x not in val_idx]
         yield train_idx, val_idx
 
+def total_mean_acc(env_classified, total_acc):
+    total_classified = sum(env_classified)
+    acc = 0
+    for i in range(len(total_acc)):
+        acc += total_acc[i] * env_classified[i] / total_classified
+    return np.around(acc, decimals=2)
+
 def save_model(clf, environment):
     os.makedirs('./models', exist_ok=True)
     with open('./models/{}_final_model.pkl'.format(environment), 'wb') as f:
@@ -97,6 +104,9 @@ if __name__ == '__main__':
     np.random.seed(0)
     random.seed(0)
 
+    env_classified = []
+    total_acc = []
+
     for env in _ENVIRONMENT:
 
         print('')
@@ -111,6 +121,7 @@ if __name__ == '__main__':
         num_frames = dataset.valid_frame_num
 
         X = frame_by_frame_samples(extract_features_type1(X, num_frames), num_frames)
+        X = normalize_allsamples(X)
         Y = frame_by_frame_labels(Y, num_frames)
 
         # print classes distribution
@@ -120,6 +131,7 @@ if __name__ == '__main__':
         for i in range(len(bins)):
             oneh_vector[i] = bins[i] 
         print(oneh_vector)
+        env_classified.append(len(Y))
  
 
         if params.evaluation == 'cv' or 'full':
@@ -131,6 +143,7 @@ if __name__ == '__main__':
             for i in range(4):
                 print(scores[i])
             print("Mean Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+            total_acc.append(scores.mean())
         if params.evaluation == 'full':
             # produces confusion matrices
             clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
@@ -152,5 +165,7 @@ if __name__ == '__main__':
             save_model(clf, env)
             np.set_printoptions(precision=2)
             plot_confusion_matrix(correct_labels, pred_labels, classes=np.array(_CLASS_NAMES), normalize=True, title=env)
-
+    print('')
+    print('Total average accuracy across all environments: ')
+    print(total_mean_acc(env_classified, total_acc))
 

@@ -9,8 +9,20 @@ def normalize(X, valid_frame_num):
     out = np.zeros((N, feat, T))
     for i in range(N):
         for f in range(feat):
-            max_feat = np.max(np.absolute(X[i, f, :]))
-            out[i, f, :] = X[i, f, :] * (1/max_feat)
+            denom = np.max(X[i, f, :]) - np.min(X[i, f, :])
+            out[i, f, :] = X[i, f, :] * (1/denom)
+    return out
+
+def normalize_allsamples(X):
+    '''
+    normalize for each feature across all samples
+    in_shape = (N, 14)
+    '''
+    N, feat = X.shape
+    out = np.zeros((N, feat))
+    for i in range(feat):
+        denom = np.max(X[:, i]) - np.min(X[:, i])
+        out[:, i] = X[:, i] * (1/denom)
     return out
 
 def normalize_by_height(feature, X, valid_frame_num):
