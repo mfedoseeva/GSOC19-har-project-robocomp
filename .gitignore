@@ -9,6 +9,8 @@
 /test.ipynb
 /support_operations/data_separation.ipynb
 /feature_extraction/testing_features1.ipynb
+Untitled.ipynb
+total_labels.txt
 
 *.png
 # Remove previous ipynb_checkpoints

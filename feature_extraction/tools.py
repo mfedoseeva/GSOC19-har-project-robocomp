@@ -1,4 +1,10 @@
 import numpy as np
+# for standardization
+from sklearn.preprocessing import StandardScaler
+
+def standardize(X):
+    scaler = StandardScaler()
+    return scaler.fit(X).transform(X)
 
 def normalize(X, valid_frame_num):
     '''
@@ -17,6 +23,7 @@ def normalize_allsamples(X):
     '''
     normalize for each feature across all samples
     in_shape = (N, 14)
+    out_shape = in_shape
     '''
     N, feat = X.shape
     out = np.zeros((N, feat))
@@ -193,16 +200,22 @@ def frame_by_frame_labels(labels, valid_frame_num):
     return new_labels
 
 
-def flatten(X, valid_frame_num):
+def fbf_raw_data(X, valid_frame_num):
     '''
-    turn two-dim data into one-dim data by stacking
-    in_shape = (num_frames, features)
-    out_shape = (valid_frames*features)
+    turns every frame into a sample, but keeps the raw data xyz for each joint, i.e.
+    turns four-dim array into three dim-array
+    in_shape = (N, C, T, V)
+    out_shape = (sum(num_frames), C, V)
     '''
-    _, V = X.shape
-    data = np.zeros(valid_frame_num * V)
-    for i in range(valid_frame_num):
-        data[i*valid_frame_num : i*valid_frame_num + valid_frame_num] = X[i]
+    N, C, T, V = X.shape
+    data = np.zeros((sum(valid_frame_num), C, V))
+    counter = 0
+    for i, frames in enumerate(valid_frame_num):
+        # shape of seq = (C, T, V)
+        seq = X[i]
+        for j in range(frames):
+            data[counter, :, :] = seq[:, j, :]
+            counter +=1
     return data
 
 
@@ -235,21 +248,22 @@ def flatten(X, valid_frame_num):
 #     for i in range(9):
 #         data[i] = X[idx[i], :]
 
-# def cos_dist(joint1, joint2, valid_frame_num1, valid_frame_num2):
-#     '''
-#     cosine distance of a joint relative to another joint
-#     in_shape = (3, n_frames)
-#     out_shape = (3, n_frames)
-#     '''
-#     assert(valid_frame_num1 == valid_frame_num2)
+def cos_dist(joint1, joint2, n_frames):
+    '''
+    cosine distance of a joint relative to another joint
+    in_shape = (n_frames, 3)
+    out_shape = (n_frames, 3)
+    '''
     
-#     out = np.zeros(valid_frame_num1)
-#     for t in range(valid_frame_num1):
-#         dot_prod = np.dot(joint1[t], joint2[t])
-#         a = np.linalg.norm(joint1[:,t])
-#         b = np.linalg.norm(joint2[:, t])
-#         out[t] = dot_prod/(a * b)   
-#     return out
+    out = np.zeros(n_frames)
+    for t in range(n_frames):
+        dot_prod = np.dot(joint1[t, :], joint2[t, :])
+        a = np.linalg.norm(joint1[t, :])
+        b = np.linalg.norm(joint2[t, :])
+        # if(a == 0 or b == 0):
+        #     print(t)
+        out[t] = dot_prod / (a * b)   
+    return out
 
 # def cos_dist_totorso(joint1, torso_coords, valid_frame_num):
 #     '''
