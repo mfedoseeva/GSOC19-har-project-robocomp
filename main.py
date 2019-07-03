@@ -162,7 +162,7 @@ if __name__ == '__main__':
                 pred_labels[prev : (prev + pred_len)] = Y_pred
                 correct_labels[prev : (prev + pred_len)] = Y_test
                 prev = prev + pred_len
-            save_model(clf, env)
+            #save_model(clf, env)
             np.set_printoptions(precision=2)
             plot_confusion_matrix(correct_labels, pred_labels, classes=np.array(_CLASS_NAMES), normalize=True, title=env)
     print('')
