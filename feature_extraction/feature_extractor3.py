@@ -2,7 +2,7 @@ from feature_extraction import tools
 # import tools
 import numpy as np
 
-def extract_features_type1(X, num_frames):
+def extract_features_type3(X, num_frames):
 	'''
 	extracts 14 features
 	centers the data at torso
@@ -13,8 +13,6 @@ def extract_features_type1(X, num_frames):
 	''' 
 	# N - samples, C - xyz, T - frames(all 2K for now, use num_frames to get actual length of a sample), V - joints 
 	N, C, T, V = X.shape
-	# center all data first
-	X = tools.center(X, num_frames)
 	# we will use 14 features this time
 	features = np.zeros((N, 14, T))
 	# dist between two hands 11, 12 and a head 0

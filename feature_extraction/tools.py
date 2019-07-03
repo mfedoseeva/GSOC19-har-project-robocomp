@@ -132,10 +132,14 @@ def dist_to_joint_single(joint1, joint2):
 def horizontal_flip(X, valid_frame_num):
     '''
     flip horizontally all data relative to torso, assumes that data is centered at torso
-    in_shape = out_shape
+    in_shape = N, C, T, V
+    out_shape = in_shape
     '''
-    for t in range(valid_frame_num):
-        X[0, t, :] *= -1
+    N, _, _, _ = X.shape
+    X_flipped = np.copy(X)
+    for i in range(N):
+        for t in range(valid_frame_num[i]):
+            X_flipped[i, 0, t, :] *= -1
 
 def clip_samples_even(X, valid_frames_num):
     '''

@@ -2,7 +2,7 @@ import argparse
 import os
 import random
 import numpy as np
-from feature_extraction.feature_extractor1 import extract_features_type1
+from feature_extraction.feature_extractor3 import extract_features_type3
 from feature_extraction.tools import *
 from feeder.feeder import Feeder
 from feeder import utils
@@ -89,6 +89,16 @@ def save_model(clf, environment):
     with open('./models/{}_final_model.pkl'.format(environment), 'wb') as f:
         pickle.dump(clf, f)
 
+def print_distribution(labels, total_classes=12):
+    # print classes distribution
+    print('Distribution of samples across label bins: ')
+    oneh_vector = np.zeros(12)
+    bins = np.bincount(labels)
+    for i in range(len(bins)):
+        oneh_vector[i] = bins[i] 
+    print(oneh_vector)
+    env_classified.append(len(labels))
+
 if __name__ == '__main__':
     # Load the parameters from json file
     args = parser.parse_args()
@@ -119,19 +129,25 @@ if __name__ == '__main__':
         X = dataset.data
         Y = dataset.label
         num_frames = dataset.valid_frame_num
+        num_actions = dataset.num_actions
 
-        X = frame_by_frame_samples(extract_features_type1(X, num_frames), num_frames)
+        X = center(X, num_frames)
+
+        X_augm = np.copy(X)
+        X_augm = horizontal_flip(X_augm, num_frames)
+
+        X = frame_by_frame_samples(extract_features_type3(X, num_frames), num_frames)
         X = normalize_allsamples(X)
         Y = frame_by_frame_labels(Y, num_frames)
 
-        # print classes distribution
-        print('Distribution of samples across label bins: ')
-        oneh_vector = np.zeros(12)
-        bins = np.bincount(Y)
-        for i in range(len(bins)):
-            oneh_vector[i] = bins[i] 
-        print(oneh_vector)
-        env_classified.append(len(Y))
+        X_augm = frame_by_frame_samples(extract_features_type3(X_augm, num_frames), num_frames)
+        X_augm = normalize_allsamples(X_augm)
+
+        print_distribution(Y)
+        
+
+        for i in range(_SUBJECTS):
+
  
 
         if params.evaluation == 'cv' or 'full':

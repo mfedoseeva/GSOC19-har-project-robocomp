@@ -58,6 +58,9 @@ class Feeder():
         # load num of valid frame length
         self.valid_frame_num = np.load(self.num_frame_path)
 
+        # actions per subjects
+        self.actions_num = len(self.label)/4
+
         # N - sample, C - xyz, T - frame, V - joint
         if self.max_body == 1 :
             self.N, self.C, self.T, self.V = self.data.shape
