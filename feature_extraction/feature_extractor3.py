@@ -1,33 +1,40 @@
 from feature_extraction import tools
 # import tools
+from feature_extraction import features_lib as fl
 import numpy as np
 
 def extract_features_type3(X, num_frames):
 	'''
-	extracts 14 features
-	centers the data at torso
-	distance based features for (two hands and head), (two hands), (shoulders and feet), (hit and feet)
-	temporal positional features for hands, elbows and head
-	normalizes the data and rounds
-	out_shape (N, 14. n_frames)
+	assumes data is already centered at torso
+	in_shape = (N, C, T, V)
+	out_shape = (N, num_features, T)
 	''' 
 	# N - samples, C - xyz, T - frames(all 2K for now, use num_frames to get actual length of a sample), V - joints 
 	N, C, T, V = X.shape
 	# we will use 14 features this time
 	features = np.zeros((N, 14, T))
 	# dist between two hands 11, 12 and a head 0
-	features[:, 0, :] = tools.dist_to_joint_allsamples(
-    X[:, :, :, 11], X[:, :, :, 0], num_frames) + tools.dist_to_joint_allsamples(
-    X[:, :, :, 12], X[:, :, :, 0], num_frames)
+	features[:, 0, :] = tools.normalize_by_height(tools.dist_to_joint_allsamples(
+    X[:, :, :, 11], X[:, :, :, 0], num_frames), X, num_frames)
+    features[:, 1, :] = tools.normalize_by_height(tools.dist_to_joint_allsamples(
+    X[:, :, :, 12], X[:, :, :, 0], num_frames), X, num_frames)
+    # dist between elbows and head 4, 6
+    features[:, 2, :] = tools.normalize_by_height(tools.dist_to_joint_allsamples(
+    X[:, :, :, 4], X[:, :, :, 0], num_frames), X, num_frames)
+    features[:, 3, :] = tools.normalize_by_height(tools.dist_to_joint_allsamples(
+    X[:, :, :, 6], X[:, :, :, 0], num_frames), X, num_frames)
     # dist between two hands 11, 12
-	features[:, 1, :] = tools.dist_to_joint_allsamples(X[:, :, :, 11], X[:, :, :, 12], num_frames)
-	# dist between shoulders and feet 3, 5, 13, 14
-	features[:, 2, :] = tools.dist_to_joint_allsamples(
-    X[:, :, :, 3], X[:, :, :, 13], num_frames) + tools.dist_to_joint_allsamples(
-    X[:, :, :, 5], X[:, :, :, 14], num_frames)
-    # dist between hip and feet 7, 9, 13, 14
-	features[:, 3, :] = tools.dist_to_joint_allsamples(X[:, :, :, 7], X[:, :, :, 13], num_frames) + tools.dist_to_joint_allsamples(X[:, :, :, 9], X[:, :, :, 14], num_frames)
+	features[:, 4, :] = tools.dist_to_joint_allsamples(X[:, :, :, 11], X[:, :, :, 12], num_frames)
+	# torso inclination
+	features[:, 5, :] = fl.body_incline(X, num_frames)
+	# knee bend
+	features[:, 6, :] = fl.knee_bend(X, num_frames)
+	# head tilt
+	features[:, 7, :] = fl.head_tilt(X, num_frames)
+	# cos dist between elbows and hand
+	features[:, 8, :] = 
     # temporal positional features
+
 	# left hand 11 x, y
 	features[:, 4, :] = tools.diff_position_x(X[:, :, :, 11], num_frames)
 	features[:, 5, :] = tools.diff_position_y(X[:, :, :, 11], num_frames)

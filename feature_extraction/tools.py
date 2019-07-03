@@ -37,6 +37,7 @@ def normalize_by_height(feature, X, valid_frame_num):
     normalize a (distance) feature by the "height" of a person in the frame, where height is calc. as dist(foot, knee) + dist(knee, hip) + dist(torso, neck) +
     dist(neck, head)
     feature.shape = (N, n_frame)
+    out_shape = feature.shape
     '''
     N, C, T, V = X.shape
     normed_feature = np.zeros((feature.shape))
@@ -140,6 +141,7 @@ def horizontal_flip(X, valid_frame_num):
     for i in range(N):
         for t in range(valid_frame_num[i]):
             X_flipped[i, 0, t, :] *= -1
+    return X_flipped
 
 def clip_samples_even(X, valid_frames_num):
     '''
@@ -287,3 +289,5 @@ def cos_dist(joint1, joint2, n_frames):
 #             print(a*b)
 #             out[t] = dot_prod/(a * b)   
 #     return out
+
+

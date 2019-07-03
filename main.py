@@ -58,10 +58,15 @@ def custom_cv_subj_fbf(valid_frame_num, subjects=_SUBJECTS):
         prev += frames_per_subject[i] 
 
     start = 0
+    # we want to train on all samples except for the frames belonging to a subject that is used as validation and the augmented 
+    # samples belonging to that subject being validated
+    original_frames = sum(valid_frame_num)
+    total_frames = 2 * sum(valid_frame_num)
     for i in range(subjects):
         val_idx = np.arange(start, subj_end_idx[i])
+        excluded_from_training = np.arange(original_frames + start, original_frames + subj_end_idx[i])
         start += frames_per_subject[i]
-        train_idx = [x for x in range(sum(valid_frame_num)) if x not in val_idx]
+        train_idx = [x for x in range(total_frames) if x not in val_idx and x not in excluded_from_training]
         yield train_idx, val_idx
 
 def custom_cv_subj(data):
@@ -129,7 +134,6 @@ if __name__ == '__main__':
         X = dataset.data
         Y = dataset.label
         num_frames = dataset.valid_frame_num
-        num_actions = dataset.num_actions
 
         X = center(X, num_frames)
 
@@ -146,15 +150,16 @@ if __name__ == '__main__':
         print_distribution(Y)
         
 
-        for i in range(_SUBJECTS):
-
+        X = np.vstack((X, X_augm))
+        Y_orig = np.copy(Y)
+        Y = np.concatenate((Y, Y), axis=None)
  
+        clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
 
         if params.evaluation == 'cv' or 'full':
             # runs cross validation and outputs accuracy
-            clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
             custom_cv = custom_cv_subj_fbf(num_frames)
-            scores = cross_val_score(clf, X, Y, cv=custom_cv)
+            scores = cross_val_score(clf, X, Y, cv=custom_cv, n_jobs=-1)
             print('Accuracy for each fold, i.e. subject')
             for i in range(4):
                 print(scores[i])
@@ -162,9 +167,8 @@ if __name__ == '__main__':
             total_acc.append(scores.mean())
         if params.evaluation == 'full':
             # produces confusion matrices
-            clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
-            pred_labels = np.empty(len(Y), dtype=int)
-            correct_labels = np.empty(len(Y), dtype=int)
+            pred_labels = np.empty(len(Y_orig), dtype=int)
+            correct_labels = np.empty(len(Y_orig), dtype=int)
             custom_cv = custom_cv_subj_fbf(num_frames)
             prev = 0
             for i in custom_cv:
@@ -178,7 +182,6 @@ if __name__ == '__main__':
                 pred_labels[prev : (prev + pred_len)] = Y_pred
                 correct_labels[prev : (prev + pred_len)] = Y_test
                 prev = prev + pred_len
-            save_model(clf, env)
             np.set_printoptions(precision=2)
             plot_confusion_matrix(correct_labels, pred_labels, classes=np.array(_CLASS_NAMES), normalize=True, title=env)
     print('')
