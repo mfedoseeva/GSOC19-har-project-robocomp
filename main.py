@@ -12,6 +12,7 @@ import pickle
 # for SVM
 from sklearn import svm
 from sklearn.model_selection import cross_val_score
+from sklearn.decomposition import PCA
 
 _ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
 _SUBJECTS = 4
@@ -153,8 +154,13 @@ if __name__ == '__main__':
         X = np.vstack((X, X_augm))
         Y_orig = np.copy(Y)
         Y = np.concatenate((Y, Y), axis=None)
- 
-        clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
+
+        # pca = PCA(n_components=12)
+        # pca.fit(X)
+        # print(pca.explained_variance_ratio_)  
+        # print(pca.components_)
+
+        clf = svm.SVC(decision_function_shape='ovo', gamma='scale', C=0.5)
 
         if params.evaluation == 'cv' or 'full':
             # runs cross validation and outputs accuracy

@@ -3,6 +3,9 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 def standardize(X):
+    '''
+    in_shape = (N, n_features)
+    '''
     scaler = StandardScaler()
     return scaler.fit(X).transform(X)
 
@@ -32,6 +35,18 @@ def normalize_allsamples(X):
         out[:, i] = X[:, i] * (1/denom)
     return out
 
+def normalize_allsamples_byjoint(X):
+    '''
+    normalize for each feature across all samples
+    in_shape = (N)
+    out_shape = in_shape
+    '''
+    N = X.shape
+    out = np.zeros(N)
+    denom = np.max(X) - np.min(X)
+    out[:] = X[:] * (1/denom)
+    return out
+
 def normalize_by_height(feature, X, valid_frame_num):
     '''
     normalize a (distance) feature by the "height" of a person in the frame, where height is calc. as dist(foot, knee) + dist(knee, hip) + dist(torso, neck) +
@@ -43,10 +58,10 @@ def normalize_by_height(feature, X, valid_frame_num):
     normed_feature = np.zeros((feature.shape))
     for i in range(N):
         for t in range(valid_frame_num[i]):
-            foot_knee = dist_to_torso_singleframe(X[i, :, t, 13], X[i, :, t, 8])
-            knee_hip = dist_to_torso_singleframe(X[i, :, t, 8], X[i, :, t, 7])
-            torso_neck = dist_to_torso_singleframe(X[i, :, t, 2], X[i, :, t, 1])
-            neck_head = dist_to_torso_singleframe(X[i, :, t, 1], X[i, :, t, 0])
+            foot_knee = dist_to_joint_single(X[i, :, t, 13], X[i, :, t, 8])
+            knee_hip = dist_to_joint_single(X[i, :, t, 8], X[i, :, t, 7])
+            torso_neck = dist_to_joint_single(X[i, :, t, 2], X[i, :, t, 1])
+            neck_head = dist_to_joint_single(X[i, :, t, 1], X[i, :, t, 0])
             height = foot_knee + knee_hip + torso_neck + neck_head
             normed_feature[i, t] = feature[i, t] / height
     return normed_feature
@@ -225,6 +240,7 @@ def fbf_raw_data(X, valid_frame_num):
     return data
 
 
+
 # def cut_sample(X, valid_frame_num, length):
 #     '''
 #     takes in data and returns valid_frame_num/length samples
@@ -254,21 +270,40 @@ def fbf_raw_data(X, valid_frame_num):
 #     for i in range(9):
 #         data[i] = X[idx[i], :]
 
-def cos_dist(joint1, joint2, n_frames):
+def cos_dist(joint1, joint2, n_frames, valid_frame_num, V=2000):
     '''
     cosine distance of a joint relative to another joint
     in_shape = (n_frames, 3)
-    out_shape = (n_frames, 3)
+    out_shape = (N, n_frames)
     '''
     
-    out = np.zeros(n_frames)
+    res = np.zeros(n_frames)
     for t in range(n_frames):
         dot_prod = np.dot(joint1[t, :], joint2[t, :])
         a = np.linalg.norm(joint1[t, :])
         b = np.linalg.norm(joint2[t, :])
-        # if(a == 0 or b == 0):
-        #     print(t)
-        out[t] = dot_prod / (a * b)   
+        res[t] = dot_prod / (a * b)
+    out = np.zeros((len(valid_frame_num), V))
+    prev = 0   
+    for i, frames in enumerate(valid_frame_num):
+        out[i, :frames] = res[prev: prev + frames]
+        prev += frames
+    return out
+
+def cos_dist2(joint1, joint2, valid_frame_num):
+    '''
+    cosine distance of a joint relative to another joint
+    in_shape = (N, 3, T)
+    out_shape = (N, T)
+    '''   
+    N, _, T = joint1.shape
+    out = np.zeros((N, T))
+    for i in range(N):
+        for t in range(valid_frame_num[i]):
+            dot_prod = np.dot(joint1[i, :, t], joint2[i, :, t])
+            a = np.linalg.norm(joint1[i, :, t])
+            b = np.linalg.norm(joint2[i, :, t])
+            out[i, t] = dot_prod/(a * b)
     return out
 
 # def cos_dist_totorso(joint1, torso_coords, valid_frame_num):
