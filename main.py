@@ -2,7 +2,7 @@ import argparse
 import os
 import random
 import numpy as np
-from feature_extraction.feature_extractor1 import extract_features_type1
+from feature_extraction.feature_extractor3 import extract_features_type3
 from feature_extraction.tools import *
 from feeder.feeder import Feeder
 from feeder import utils
@@ -12,6 +12,7 @@ import pickle
 # for SVM
 from sklearn import svm
 from sklearn.model_selection import cross_val_score
+from sklearn.decomposition import PCA
 
 _ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
 _SUBJECTS = 4
@@ -58,10 +59,15 @@ def custom_cv_subj_fbf(valid_frame_num, subjects=_SUBJECTS):
         prev += frames_per_subject[i] 
 
     start = 0
+    # we want to train on all samples except for the frames belonging to a subject that is used as validation and the augmented 
+    # samples belonging to that subject being validated
+    original_frames = sum(valid_frame_num)
+    total_frames = 2 * sum(valid_frame_num)
     for i in range(subjects):
         val_idx = np.arange(start, subj_end_idx[i])
+        excluded_from_training = np.arange(original_frames + start, original_frames + subj_end_idx[i])
         start += frames_per_subject[i]
-        train_idx = [x for x in range(sum(valid_frame_num)) if x not in val_idx]
+        train_idx = [x for x in range(total_frames) if x not in val_idx and x not in excluded_from_training]
         yield train_idx, val_idx
 
 def custom_cv_subj(data):
@@ -88,6 +94,16 @@ def save_model(clf, environment):
     os.makedirs('./models', exist_ok=True)
     with open('./models/{}_final_model.pkl'.format(environment), 'wb') as f:
         pickle.dump(clf, f)
+
+def print_distribution(labels, total_classes=12):
+    # print classes distribution
+    print('Distribution of samples across label bins: ')
+    oneh_vector = np.zeros(12)
+    bins = np.bincount(labels)
+    for i in range(len(bins)):
+        oneh_vector[i] = bins[i] 
+    print(oneh_vector)
+    env_classified.append(len(labels))
 
 if __name__ == '__main__':
     # Load the parameters from json file
@@ -120,25 +136,36 @@ if __name__ == '__main__':
         Y = dataset.label
         num_frames = dataset.valid_frame_num
 
-        X = frame_by_frame_samples(extract_features_type1(X, num_frames), num_frames)
+        X = center(X, num_frames)
+
+        X_augm = np.copy(X)
+        X_augm = horizontal_flip(X_augm, num_frames)
+
+        X = frame_by_frame_samples(extract_features_type3(X, num_frames), num_frames)
         X = normalize_allsamples(X)
         Y = frame_by_frame_labels(Y, num_frames)
 
-        # print classes distribution
-        print('Distribution of samples across label bins: ')
-        oneh_vector = np.zeros(12)
-        bins = np.bincount(Y)
-        for i in range(len(bins)):
-            oneh_vector[i] = bins[i] 
-        print(oneh_vector)
-        env_classified.append(len(Y))
- 
+        X_augm = frame_by_frame_samples(extract_features_type3(X_augm, num_frames), num_frames)
+        X_augm = normalize_allsamples(X_augm)
+
+        print_distribution(Y)
+        
+
+        X = np.vstack((X, X_augm))
+        Y_orig = np.copy(Y)
+        Y = np.concatenate((Y, Y), axis=None)
+
+        # pca = PCA(n_components=12)
+        # pca.fit(X)
+        # print(pca.explained_variance_ratio_)  
+        # print(pca.components_)
+
+        clf = svm.SVC(decision_function_shape='ovo', gamma='scale', C=0.5)
 
         if params.evaluation == 'cv' or 'full':
             # runs cross validation and outputs accuracy
-            clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
             custom_cv = custom_cv_subj_fbf(num_frames)
-            scores = cross_val_score(clf, X, Y, cv=custom_cv)
+            scores = cross_val_score(clf, X, Y, cv=custom_cv, n_jobs=-1)
             print('Accuracy for each fold, i.e. subject')
             for i in range(4):
                 print(scores[i])
@@ -146,9 +173,8 @@ if __name__ == '__main__':
             total_acc.append(scores.mean())
         if params.evaluation == 'full':
             # produces confusion matrices
-            clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
-            pred_labels = np.empty(len(Y), dtype=int)
-            correct_labels = np.empty(len(Y), dtype=int)
+            pred_labels = np.empty(len(Y_orig), dtype=int)
+            correct_labels = np.empty(len(Y_orig), dtype=int)
             custom_cv = custom_cv_subj_fbf(num_frames)
             prev = 0
             for i in custom_cv:
@@ -162,7 +188,6 @@ if __name__ == '__main__':
                 pred_labels[prev : (prev + pred_len)] = Y_pred
                 correct_labels[prev : (prev + pred_len)] = Y_test
                 prev = prev + pred_len
-            #save_model(clf, env)
             np.set_printoptions(precision=2)
             plot_confusion_matrix(correct_labels, pred_labels, classes=np.array(_CLASS_NAMES), normalize=True, title=env)
     print('')

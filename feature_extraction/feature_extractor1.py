@@ -42,7 +42,7 @@ def extract_features_type1(X, num_frames):
 	# right elbow 6
 	features[:, 10, :] = tools.diff_position_x(X[:, :, :, 6], num_frames)
 	features[:, 11, :] = tools.diff_position_y(X[:, :, :, 6], num_frames)
-	# right head 0
+	# head 0
 	features[:, 12, :] = tools.diff_position_x(X[:, :, :, 0], num_frames)
 	features[:, 13, :] = tools.diff_position_y(X[:, :, :, 0], num_frames)
 	# normalize and round
