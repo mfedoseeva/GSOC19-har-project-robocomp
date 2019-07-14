@@ -52,8 +52,7 @@ def normalize_allsamples_byjoint(X):
 
 def normalize_by_height(feature, X, valid_frame_num):
     '''
-    normalize a (distance) feature by the "height" of a person in the frame, where height is calc. as dist(foot, knee) + dist(knee, hip) + dist(torso, neck) +
-    dist(neck, head)
+    normalize a (distance) feature by the "height" of a person in the frame, where height is calc. as dist(torso, neck)*3
     feature.shape = (N, n_frame)
     out_shape = feature.shape
     '''
@@ -61,11 +60,8 @@ def normalize_by_height(feature, X, valid_frame_num):
     normed_feature = np.zeros((feature.shape))
     for i in range(N):
         for t in range(valid_frame_num[i]):
-            foot_knee = dist_to_joint_single(X[i, :, t, 13], X[i, :, t, 8])
-            knee_hip = dist_to_joint_single(X[i, :, t, 8], X[i, :, t, 7])
             torso_neck = dist_to_joint_single(X[i, :, t, 2], X[i, :, t, 1])
-            neck_head = dist_to_joint_single(X[i, :, t, 1], X[i, :, t, 0])
-            height = foot_knee + knee_hip + torso_neck + neck_head
+            height = torso_neck * 3
             normed_feature[i, t] = feature[i, t] / height
     return normed_feature
 

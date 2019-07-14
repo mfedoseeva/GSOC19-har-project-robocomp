@@ -14,6 +14,12 @@ from sklearn import svm
 from sklearn.model_selection import cross_val_score
 from sklearn.decomposition import PCA
 
+# for ensemble
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import VotingClassifier
+
 _ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
 _SUBJECTS = 4
 _CLASS_NAMES = ['talking on the phone', 'writing on whiteboard', 'drinking water', 'rinsing mouth with water', 'brushing teeth', 'wearing contact lenses', 'talking on couch', 'relaxing on couch', 'cooking (chopping)', 'cooking (stirring)', 'opening pill container', 'working on computer']
@@ -38,9 +44,9 @@ def fetch_data(params):
     else:
         raise NotImplementedError('only CAD-60 is supported')
 
-def custom_cv_subj(new_samples_num, subjects=_SUBJECTS):
+def custom_cv_subj(new_samples_num, augm=False, subjects=_SUBJECTS):
     ''' 
-    custom cross-validation rule, each fold = 1 subject. Frame by Frame classification
+    custom cross-validation rule, each fold = 1 subject. augm flag is False if augmented data is not used for training
     '''
     n = len(new_samples_num)
     actions = int(n/subjects)
@@ -51,7 +57,6 @@ def custom_cv_subj(new_samples_num, subjects=_SUBJECTS):
     for i in range(subjects):
         samples_per_subject[i] = sum(new_samples_num[i * actions : i * actions + actions])
 
-    print(samples_per_subject)
     subj_end_idx = [None]*subjects
 
     prev = 0
@@ -62,13 +67,16 @@ def custom_cv_subj(new_samples_num, subjects=_SUBJECTS):
     start = 0
     # we want to train on all samples except for the frames belonging to a subject that is used as validation and the augmented 
     # samples belonging to that subject being validated
-    original_samples = sum(new_samples_num)
-    total_samples = 2 * sum(new_samples_num)
+    total_samples = sum(new_samples_num)
     for i in range(subjects):
         val_idx = np.arange(start, subj_end_idx[i])
-        excluded_from_training = np.arange(original_samples + start, original_samples + subj_end_idx[i])
+        if augm:
+            excluded_from_training = np.arange(total_samples + start, total_samples + subj_end_idx[i])
         start += samples_per_subject[i]
-        train_idx = [x for x in range(total_samples) if x not in val_idx and x not in excluded_from_training]
+        if augm:
+            train_idx = [x for x in range(2 * total_samples) if x not in val_idx and x not in excluded_from_training]
+        else:
+            train_idx = [x for x in range(total_samples) if x not in val_idx]
         yield train_idx, val_idx
 
 
@@ -132,10 +140,10 @@ if __name__ == '__main__':
         X_augm = horizontal_flip(X_augm, num_frames)
         Y_orig = np.copy(Y)
 
-        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=75, sampled_freq=25)
+        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=100, sampled_freq=25)
         X = normalize_allsamples(X)
 
-        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=75, sampled_freq=25)
+        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=100, sampled_freq=25)
         X_augm = normalize_allsamples(X_augm)
 
         print('training data shape: ')
@@ -156,7 +164,7 @@ if __name__ == '__main__':
 
         if params.evaluation == 'cv' or 'full':
             # runs cross validation and outputs accuracy
-            custom_cv = custom_cv_subj(new_samples_num)
+            custom_cv = custom_cv_subj(new_samples_num, augm=True)
             scores = cross_val_score(clf, X, Y, cv=custom_cv, n_jobs=-1)
             print('Accuracy for each fold, i.e. subject')
             for i in range(4):
@@ -165,9 +173,9 @@ if __name__ == '__main__':
             total_acc.append(scores.mean())
         if params.evaluation == 'full':
             # produces confusion matrices
-            pred_labels = np.empty(len(Y_orig), dtype=int)
-            correct_labels = np.empty(len(Y_orig), dtype=int)
-            custom_cv = custom_cv_subj(new_samples_num)
+            pred_labels = np.empty(int(len(Y)/2), dtype=int)
+            correct_labels = np.empty(int(len(Y)/2), dtype=int)
+            custom_cv = custom_cv_subj(new_samples_num, augm=True)
             prev = 0
             for i in custom_cv:
                 train_idx, test_idx = i

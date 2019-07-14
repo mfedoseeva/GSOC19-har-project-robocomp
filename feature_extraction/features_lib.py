@@ -2,22 +2,22 @@
 from feature_extraction.tools import *
 
 
-# def body_turn(X, valid_frame_num):
-#     '''
-#     calculates the body turn by calculating the distance between the left and the rights shoulder based on 2d coordinates and divides by the
-#     distance between the same joints based on 3d coordinates
-#     in_shape = (N, C, T, V)
-#     out_shape = (N, T)
-#     '''
-#     N, C, T, V = X.shape
-#     out = np.zeros((N, T))
-#     for i in range(N):
-#       for t in range(valid_frame_num[i]):
-#           l_should_2d = X[i, 0:2, t, 3]
-#           r_should_2d = X[i, 0:2, t, 5]
-#           dist_2d = dist_to_joint_single(l_should_2d, r_should_2d)
-#           out[i, t] = dist_2d/dist_to_joint_single(X[i, :, t, 3], X[i, :, t, 5]) 
-#     return out
+def body_turn(X, valid_frame_num):
+    '''
+    calculates the body turn by calculating the distance between the left and the rights shoulder based on 2d coordinates and divides by the
+    distance between the same joints based on 3d coordinates
+    in_shape = (N, C, T, V)
+    out_shape = (N, T)
+    '''
+    N, C, T, V = X.shape
+    out = np.zeros((N, T))
+    for i in range(N):
+      for t in range(valid_frame_num[i]):
+          l_should_2d = X[i, 0:2, t, 3]
+          r_should_2d = X[i, 0:2, t, 5]
+          dist_2d = dist_to_joint_single(l_should_2d, r_should_2d)
+          out[i, t] = dist_2d/dist_to_joint_single(X[i, :, t, 3], X[i, :, t, 5]) 
+    return out
 
 def body_incline(X, valid_frame_num):
     '''

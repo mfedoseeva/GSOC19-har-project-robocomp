@@ -23,7 +23,7 @@ def extract_features(X, labels, num_frames, seq_length=75, sampled_freq=5):
     N_new, _, T_new, _ = X.shape
     num_frames = [T_new] * N_new
 
-    features = np.zeros((N_new, 8, T_new))
+    features = np.zeros((N_new, 15, T_new))
 
     # dist between two hands 11, 12 and a head 0
     features[:, 0, :] = tools.dist_to_joint_allsamples(
@@ -43,16 +43,22 @@ def extract_features(X, labels, num_frames, seq_length=75, sampled_freq=5):
     # head tilt
     # features[:, 4, :] = fl.head_tilt(X, num_frames)
 
-    # head to torso
+    # dist between head and torso
     features[:, 4, :] = tools.dist_to_joint_allsamples(X[:, :, :, 0], X[:, :, :, 2], num_frames)
     # dist between shoulders and feet 3, 5, 13, 14 - important
     features[:, 5, :] = tools.dist_to_joint_allsamples(
         X[:, :, :, 3], X[:, :, :, 13], num_frames) + tools.dist_to_joint_allsamples(
         X[:, :, :, 5], X[:, :, :, 14], num_frames)
+    # dist between shoulders and hands
+    # features[:, 6, :] = tools.dist_to_joint_allsamples(X[:, :, :, 3], X[:, :, :, 11], num_frames) + tools.dist_to_joint_allsamples(
+        # X[:, :, :, 5], X[:, :, :, 12], num_frames)
     # dist between hip and feet 7, 9, 13, 14 - drops the performance
-    # features[:, 5, :] = tools.dist_to_joint_allsamples(
+    # features[:, 6, :] = tools.dist_to_joint_allsamples(
         # X[:, :, :, 7], X[:, :, :, 13], num_frames) + tools.dist_to_joint_allsamples(X[:, :, :, 9], X[:, :, :, 14], num_frames)
 
+    # knees to torso
+    features[:, 6, :] = tools.dist_to_joint_allsamples(X[:, :, :, 8], X[:, :, :, 2], num_frames) + tools.dist_to_joint_allsamples(
+        X[:, :, :, 10], X[:, :, :, 2], num_frames)
     # cos dist features - drop the performance a lot
     # left_elbow_hand = tools.cos_dist2(X[:, :, :, 3], X[:, :, :, 11], num_frames)
     # right_elbow_hand = tools.cos_dist2(X[:, :, :,5], X[:, :, :, 12], num_frames)
@@ -61,11 +67,11 @@ def extract_features(X, labels, num_frames, seq_length=75, sampled_freq=5):
 
     # temporal positional features
     # left hand 11 x, y
-    # features[:, 6, :] = tools.diff_position_x(X[:, :, :, 11], num_frames)
-    # features[:, 7, :] = tools.diff_position_y(X[:, :, :, 11], num_frames)
+    features[:, 7, :] = tools.diff_position_x(X[:, :, :, 11], num_frames)
+    features[:, 8, :] = tools.diff_position_y(X[:, :, :, 11], num_frames)
     # right hand 12
-    # features[:, 6, :] = tools.diff_position_x(X[:, :, :, 12], num_frames)
-    # features[:, 7, :] = tools.diff_position_y(X[:, :, :, 12], num_frames)
+    features[:, 9, :] = tools.diff_position_x(X[:, :, :, 12], num_frames)
+    features[:, 10, :] = tools.diff_position_y(X[:, :, :, 12], num_frames)
     # # left elbow 4
     # features[:, 6, :] = tools.diff_position_x(X[:, :, :, 4], num_frames)
     # features[:, 7, :] = tools.diff_position_y(X[:, :, :, 4], num_frames)
@@ -73,8 +79,13 @@ def extract_features(X, labels, num_frames, seq_length=75, sampled_freq=5):
     # features[:, 8, :] = tools.diff_position_x(X[:, :, :, 6], num_frames)
     # features[:, 9, :] = tools.diff_position_y(X[:, :, :, 6], num_frames)
     # head 0
-    features[:, 6, :] = tools.diff_position_x(X[:, :, :, 0], num_frames)
-    features[:, 7, :] = tools.diff_position_y(X[:, :, :, 0], num_frames)
+    features[:, 11, :] = tools.diff_position_x(X[:, :, :, 0], num_frames)
+    features[:, 12, :] = tools.diff_position_y(X[:, :, :, 0], num_frames)
+    # if we are vieweing from the side
+    features[:, 13, :] = fl.body_turn(X, num_frames)
+    # hands to knees
+    features[:, 14, :] = tools.dist_to_joint_allsamples(X[:, :, :, 11], X[:, :, :, 8], num_frames) + tools.dist_to_joint_allsamples(
+        X[:, :, :, 12], X[:, :, :, 10], num_frames)
     # round
     features = np.around(features, decimals=4)
     # count = 0
