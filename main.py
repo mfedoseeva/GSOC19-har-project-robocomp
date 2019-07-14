@@ -2,7 +2,7 @@ import argparse
 import os
 import random
 import numpy as np
-from feature_extraction.feature_extractor3 import extract_features_type3
+from feature_extraction.feature_extractor_for_sequence import extract_features
 from feature_extraction.tools import *
 from feeder.feeder import Feeder
 from feeder import utils
@@ -38,50 +38,39 @@ def fetch_data(params):
     else:
         raise NotImplementedError('only CAD-60 is supported')
 
-def custom_cv_subj_fbf(valid_frame_num, subjects=_SUBJECTS):
+def custom_cv_subj(new_samples_num, subjects=_SUBJECTS):
     ''' 
     custom cross-validation rule, each fold = 1 subject. Frame by Frame classification
     '''
-    n = len(valid_frame_num)
-    actions = n/subjects
+    n = len(new_samples_num)
+    actions = int(n/subjects)
     
-    frames_per_subject = np.zeros(subjects, dtype=int)
-    for i in range(n):
-        # subj from 0 to 3
-        subj = int(i/actions)
-        frames_per_subject[subj] += valid_frame_num[i]
+    samples_per_subject = np.zeros(subjects, dtype=int)
     
+    # determine now many samples we have per subjects
+    for i in range(subjects):
+        samples_per_subject[i] = sum(new_samples_num[i * actions : i * actions + actions])
+
+    print(samples_per_subject)
     subj_end_idx = [None]*subjects
 
     prev = 0
     for i in range(subjects):
-        subj_end_idx[i] = frames_per_subject[i] + prev
-        prev += frames_per_subject[i] 
+        subj_end_idx[i] = samples_per_subject[i] + prev
+        prev += samples_per_subject[i] 
 
     start = 0
     # we want to train on all samples except for the frames belonging to a subject that is used as validation and the augmented 
     # samples belonging to that subject being validated
-    original_frames = sum(valid_frame_num)
-    total_frames = 2 * sum(valid_frame_num)
+    original_samples = sum(new_samples_num)
+    total_samples = 2 * sum(new_samples_num)
     for i in range(subjects):
         val_idx = np.arange(start, subj_end_idx[i])
-        excluded_from_training = np.arange(original_frames + start, original_frames + subj_end_idx[i])
-        start += frames_per_subject[i]
-        train_idx = [x for x in range(total_frames) if x not in val_idx and x not in excluded_from_training]
+        excluded_from_training = np.arange(original_samples + start, original_samples + subj_end_idx[i])
+        start += samples_per_subject[i]
+        train_idx = [x for x in range(total_samples) if x not in val_idx and x not in excluded_from_training]
         yield train_idx, val_idx
 
-def custom_cv_subj(data):
-    ''' 
-    custom cross-validation rule, each fold = 1 subject, not for frame by frame classification
-    '''
-    n, _ = data.shape
-    subjects = _SUBJECTS
-    # some actions are performed several times
-    actions = 15
-    for i in range(subjects):
-        val_idx = np.arange(i * actions, i * actions + actions)
-        train_idx = [x for x in range(subjects * actions) if x not in val_idx]
-        yield train_idx, val_idx
 
 def total_mean_acc(env_classified, total_acc):
     total_classified = sum(env_classified)
@@ -136,23 +125,26 @@ if __name__ == '__main__':
         Y = dataset.label
         num_frames = dataset.valid_frame_num
 
+
         X = center(X, num_frames)
 
         X_augm = np.copy(X)
         X_augm = horizontal_flip(X_augm, num_frames)
+        Y_orig = np.copy(Y)
 
-        X = frame_by_frame_samples(extract_features_type3(X, num_frames), num_frames)
+        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=75, sampled_freq=25)
         X = normalize_allsamples(X)
-        Y = frame_by_frame_labels(Y, num_frames)
 
-        X_augm = frame_by_frame_samples(extract_features_type3(X_augm, num_frames), num_frames)
+        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=75, sampled_freq=25)
         X_augm = normalize_allsamples(X_augm)
+
+        print('training data shape: ')
+        print(X.shape)
 
         print_distribution(Y)
         
 
         X = np.vstack((X, X_augm))
-        Y_orig = np.copy(Y)
         Y = np.concatenate((Y, Y), axis=None)
 
         # pca = PCA(n_components=12)
@@ -160,11 +152,11 @@ if __name__ == '__main__':
         # print(pca.explained_variance_ratio_)  
         # print(pca.components_)
 
-        clf = svm.SVC(decision_function_shape='ovo', gamma='scale', C=0.5)
+        clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
 
         if params.evaluation == 'cv' or 'full':
             # runs cross validation and outputs accuracy
-            custom_cv = custom_cv_subj_fbf(num_frames)
+            custom_cv = custom_cv_subj(new_samples_num)
             scores = cross_val_score(clf, X, Y, cv=custom_cv, n_jobs=-1)
             print('Accuracy for each fold, i.e. subject')
             for i in range(4):
@@ -175,7 +167,7 @@ if __name__ == '__main__':
             # produces confusion matrices
             pred_labels = np.empty(len(Y_orig), dtype=int)
             correct_labels = np.empty(len(Y_orig), dtype=int)
-            custom_cv = custom_cv_subj_fbf(num_frames)
+            custom_cv = custom_cv_subj(new_samples_num)
             prev = 0
             for i in custom_cv:
                 train_idx, test_idx = i
