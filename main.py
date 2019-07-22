@@ -140,10 +140,10 @@ if __name__ == '__main__':
         X_augm = horizontal_flip(X_augm, num_frames)
         Y_orig = np.copy(Y)
 
-        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=100, sampled_freq=25)
+        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=120, sampled_freq=30)
         X = normalize_allsamples(X)
 
-        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=100, sampled_freq=25)
+        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=120, sampled_freq=30)
         X_augm = normalize_allsamples(X_augm)
 
         print('training data shape: ')
