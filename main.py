@@ -20,9 +20,12 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import VotingClassifier
 
-_ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
+# _ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
+_ENVIRONMENT = ['all']
 _SUBJECTS = 4
 _CLASS_NAMES = ['talking on the phone', 'writing on whiteboard', 'drinking water', 'rinsing mouth with water', 'brushing teeth', 'wearing contact lenses', 'talking on couch', 'relaxing on couch', 'cooking (chopping)', 'cooking (stirring)', 'opening pill container', 'working on computer']
+_SEQ_LENGTH = 120
+_SAMPLED_FREQ = 30
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_dir', default='./data0/', help="directory of the dataset")
@@ -140,11 +143,14 @@ if __name__ == '__main__':
         X_augm = horizontal_flip(X_augm, num_frames)
         Y_orig = np.copy(Y)
 
-        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=120, sampled_freq=30)
+        X, Y, new_samples_num = extract_features(X, Y, num_frames, seq_length=_SEQ_LENGTH, sampled_freq=_SAMPLED_FREQ)
         X = normalize_allsamples(X)
 
-        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=120, sampled_freq=30)
+        X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=_SEQ_LENGTH, sampled_freq=_SAMPLED_FREQ)
         X_augm = normalize_allsamples(X_augm)
+
+        print(f'sequence length: {_SEQ_LENGTH}')
+        print(f'sampled frequency: {_SAMPLED_FREQ}')
 
         print('training data shape: ')
         print(X.shape)
@@ -154,11 +160,6 @@ if __name__ == '__main__':
 
         X = np.vstack((X, X_augm))
         Y = np.concatenate((Y, Y), axis=None)
-
-        # pca = PCA(n_components=12)
-        # pca.fit(X)
-        # print(pca.explained_variance_ratio_)  
-        # print(pca.components_)
 
         clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
 

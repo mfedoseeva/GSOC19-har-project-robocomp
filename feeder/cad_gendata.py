@@ -65,7 +65,7 @@ def gendata(data_path,
     sample_label = []
     sample_data = []
 
-    data_path = os.path.join(data_path, e)
+    # data_path = os.path.join(data_path, e)
     out_path = os.path.join(out_path, e)
 
     os.makedirs(out_path, exist_ok=True)
@@ -148,14 +148,16 @@ def gendata(data_path,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='CAD-60 Data Converter.')
-    parser.add_argument(
-        '--data_path', default='../../cad60_separated')
+    # parser.add_argument(
+        # '--data_path', default='../../cad60_separated')
+    parser.add_argument('--data_path', default='../../cad60dataset')
     parser.add_argument('--out_folder', default='../data0/CAD-60')
 
     # everything is train data, because we will be doing cross-validation, can extend this for train-test split simply by adding 'test' to the list
     part = ['train']
 
-    environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
+    # environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
+    environments = ['all']
     arg = parser.parse_args()
 
 

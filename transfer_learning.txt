@@ -1,0 +1,90 @@
+main.py + 468:
+restore_file specified model or best checkpoint
+next - train_and_evaluate
+
+train_and_evaluate:
++321
+load checkpoint and log the metrics
+
++ 354
+train()
+
++ 360
+evaluate()
+
+train:
++102
+clipping_gradient - may be we do not need it?
+
+
+DO NOT FORGET TO FIX CENTERING
+
+Training on ALL environments:
+val subject
+4: acc 0.882
+3: acc 
+
+Full Experiment (used 100 frames, double centered on torso and head mistakenly):
+Pre-trained model:
+NTU-RGB-D-CS/HCN05
+acc. 0.830
+
+
+Full Experiment (used 100 frames, centered on torso):
+
+Pre-trained model:
+NTU-RGB-D-CS/HCN06
+acc. 0.824
+
+Fine-tuning:
+starting at epoch 393/600
+All environments:
+
+CAD-60/HCN03 - 1st fold, validation on subject 4:
+1884 training samples, 364 validation samples
+acc. 0.810
+try longer?
+
+CAD-60/HCN04 2nd fold, validation on subject 3:
+1958 training samples, 307 validation samples
+acc: 0.741
+
+CAD-60/HCN05 3rd fold, validation on subject 2:
+1968 training samples, 302 validation samples
+acc: 0.895
+
+CAD-60/HCN06 4th fold, validation on subject 1:
+1946 training samples, 313 validation samples
+acc: 0.90
+
+mean acc: 0.8347
+
+Full Experiment (used 125 frames, centered on torso):
+
+Pre-trained model:
+NTU-RGB-D-CS/HCN07
+acc. 0.831
+
+CAD-60/HCN03 - 1st fold, validation on subject 4:
+1220 training samples, 238 validation samples
+acc. 0.81
+
+
+Full Experiment (used 125 frames, no centering):
+starting from epoch 331
+
+Pre-trained model:
+NTU-RGB-D-CS/HCN08
+acc. 0.842
+
+CAD-60/HCN08 - 1st fold, validation on subject 4:
+1220 training samples, 238 validation samples
+acc. 0.756 - tried 900 epochs, but does not improve - need centering!
+
+ENVIRONMENTS experiment (100 frames):
+
+1. Office:
+
+CAD-60/HCN101 - 1st fold, validation on subject 4:
+616 training samples, 120 validation samples
+acc. 
