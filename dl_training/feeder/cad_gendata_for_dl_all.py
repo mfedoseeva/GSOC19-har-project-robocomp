@@ -15,10 +15,10 @@ _max_body = 1
 _num_joint = 15
 _max_frame = 2000
 _toolbar_width = 30
-_cut_frames = 100
+_cut_frames = 125
 _overlap = 50
 
-training_subjects = [1, 2, 3]
+training_subjects = [1, 2, 3, 4]
 
 
 # labels in the dataset are strings, we need to convert them to numbers
@@ -58,7 +58,6 @@ def end_toolbar():
 def gendata(data_path,
             out_path,
             part,
-            env,
             ignored_sample_path=None,
             ):
 
@@ -70,9 +69,6 @@ def gendata(data_path,
     sample_label = []
     sample_data = []
     valid_frame_num = []
-
-    data_path = os.path.join(data_path, e)
-    out_path = os.path.join(out_path, e)
 
     os.makedirs(out_path, exist_ok=True)
     print(data_path)
@@ -125,8 +121,6 @@ def gendata(data_path,
     data = np.zeros((len(sample_data), 3, _max_frame, _num_joint))
     for i in range(len(sample_data)):
         data[i, :, : valid_frame_num[i], :] = sample_data[i]
-    # center data - do not center, as it will be done in feeder
-    # data = center(data, valid_frame_num)
     # change to meters
     data = data/1000
 
@@ -145,7 +139,6 @@ def gendata(data_path,
     names, labels = names_labels_for_cut_samples(sample_name, sample_label, new_samples_num)
     save_data(part, out_path, labels, names, samples, valid_frame_num)
     print(part)
-    print(env)
     print(f'data shape: {samples.shape}')
     
 def save_data(part, out_path, sample_label, sample_name, sample_data, valid_frame_num):
@@ -183,22 +176,19 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='CAD-60 Data Converter.')
     parser.add_argument(
-        '--data_path', default='../../../cad60_separated')
-    parser.add_argument('--out_folder', default='../data0/CAD-60')
+        '--data_path', default='../../../cad60dataset')
+    parser.add_argument('--out_folder', default='../data0/CAD-60/all')
 
     part = ['train', 'val']
 
-    environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
     arg = parser.parse_args()
 
 
     for p in part:
-        for e in environments:
-            out_path = arg.out_folder
-            if not os.path.exists(out_path):
-                os.makedirs(out_path)
-            gendata(
-                arg.data_path,
-                out_path,
-                part=p,
-                env=e)
+        out_path = arg.out_folder
+        if not os.path.exists(out_path):
+            os.makedirs(out_path)
+        gendata(
+            arg.data_path,
+            out_path,
+            part=p)
