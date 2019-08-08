@@ -18,7 +18,7 @@ _toolbar_width = 30
 _cut_frames = 125
 _overlap = 50
 
-training_subjects = [1, 2, 3, 4]
+training_subjects = [1, 2, 3]
 
 
 # labels in the dataset are strings, we need to convert them to numbers
@@ -121,6 +121,7 @@ def gendata(data_path,
     data = np.zeros((len(sample_data), 3, _max_frame, _num_joint))
     for i in range(len(sample_data)):
         data[i, :, : valid_frame_num[i], :] = sample_data[i]
+    # data = center(data, valid_frame_num)
     # change to meters
     data = data/1000
 
