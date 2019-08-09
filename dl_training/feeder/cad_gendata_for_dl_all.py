@@ -7,18 +7,21 @@ import pickle
 import glob
 from gendata_tools import *
 import sys
+# we will reuse the cad_read_skeleton file from SVM training here
 sys.path.append('../../feeder')
 from cad_read_skeleton import read_xyz
 
 _subjects = 4
 _max_body = 1
 _num_joint = 15
+# for original data
 _max_frame = 2000
 _toolbar_width = 30
-_cut_frames = 125
-_overlap = 50
-
-training_subjects = [1, 2, 3]
+# length for cut sequnces
+_cut_frames = 130
+_overlap = 30
+# hyperparam of the NN, should agree with params.json of NN training
+_window_size = 32
 
 
 # labels in the dataset are strings, we need to convert them to numbers
@@ -57,8 +60,9 @@ def end_toolbar():
 
 def gendata(data_path,
             out_path,
+            training_subjects,
             part,
-            ignored_sample_path=None,
+            ignored_sample_path=None
             ):
 
     # no label or video for four samples and we do not count still and random samples
@@ -121,26 +125,32 @@ def gendata(data_path,
     data = np.zeros((len(sample_data), 3, _max_frame, _num_joint))
     for i in range(len(sample_data)):
         data[i, :, : valid_frame_num[i], :] = sample_data[i]
-    # data = center(data, valid_frame_num)
     # change to meters
     data = data/1000
+    print('original frame num')
+    print(valid_frame_num)
+    print(f'total samples: {len(valid_frame_num)}')
 
-    if part == 'train':
+    # do not flip on this level, flipping will be done randomly during training in the feeder
+    # if part == 'train':
         # we will double the training data by using the flipped skeletons
-        flipped_data = horizontal_flip(data, valid_frame_num)
-        total_data = np.zeros((data.shape[0]*2, 3, _max_frame, _num_joint))
-        total_data[: data.shape[0], :, :, :] = data
-        total_data[data.shape[0]:, :, :, :] = flipped_data
-        data = total_data
-        valid_frame_num = valid_frame_num * 2
-        sample_name = sample_name*2
-        sample_label = sample_label*2
-
-    samples, new_samples_num = cut_samples(data, valid_frame_num, _cut_frames, _overlap)
+        # flipped_data = horizontal_flip(data, valid_frame_num)
+        # total_data = np.zeros((data.shape[0]*2, 3, _max_frame, _num_joint))
+        # total_data[: data.shape[0], :, :, :] = data
+        # total_data[data.shape[0]:, :, :, :] = flipped_data
+        # data = total_data
+        # valid_frame_num = valid_frame_num * 2
+        # sample_name = sample_name*2
+        # sample_label = sample_label*2
+    cut_sequence, new_samples_num = cut_samples_len(data, valid_frame_num, _cut_frames, _overlap)
+    samples, new_samples_num = samples_from_cut_sequence(cut_sequence, new_samples_num, _window_size)
     names, labels = names_labels_for_cut_samples(sample_name, sample_label, new_samples_num)
+    valid_frame_num = [_window_size] * len(names)
     save_data(part, out_path, labels, names, samples, valid_frame_num)
+    print(f'training on: {training_subjects}')
     print(part)
     print(f'data shape: {samples.shape}')
+    print(f'labels len: {len(labels)}')
     
 def save_data(part, out_path, sample_label, sample_name, sample_data, valid_frame_num):
 
@@ -153,7 +163,7 @@ def save_data(part, out_path, sample_label, sample_name, sample_data, valid_fram
         '{}/{}_data.npy'.format(out_path, part),
         dtype='float32',
         mode='w+',
-        shape=(len(sample_label), 3, _cut_frames, _num_joint, 2))
+        shape=(len(sample_label), 3, _window_size, _num_joint, 2))
 
     # num of frames of every sample stored here, every sample has equal length now
     fl = open_memmap(
@@ -182,14 +192,19 @@ if __name__ == '__main__':
 
     part = ['train', 'val']
 
+    subjects = [1, 2, 3, 4]
+
     arg = parser.parse_args()
 
-
-    for p in part:
-        out_path = arg.out_folder
+    # we will create separate folder for each fold, where 1 subject is validation and the others are in the training set
+    for s in subjects:
+        training_subjects = [x for x in subjects if x != s]
+        out_path = os.path.join(arg.out_folder, str(s))
         if not os.path.exists(out_path):
             os.makedirs(out_path)
-        gendata(
-            arg.data_path,
-            out_path,
-            part=p)
+        for p in part:    
+            gendata(
+                arg.data_path,
+                out_path,
+                training_subjects,
+                part=p)
