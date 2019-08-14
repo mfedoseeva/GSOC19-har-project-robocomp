@@ -3,7 +3,7 @@
 * python 3
 * numpy
 
-## Data separation
+## Data separation (run if you want to do evaluation for each environment separately)
 
 CAD-60 dataset divides all data into 5 groups, which they call environments. To each environment only certain number of activities belong. The data itself comes in 4 folders according to the 4 subjects performing the activities.
 However the training and testing is performed per environment.  

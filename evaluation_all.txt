@@ -1,0 +1,15 @@
+
+Environment: all
+sequence length: 120
+sampled frequency: 30
+Distribution of samples across label bins: 
+[1140. 1620. 1230. 1590. 1530.  960. 1650. 1500. 1650. 1470.  720. 1350.]
+Accuracy for each fold, i.e. subject
+0.9708333333333333
+0.9184895833333333
+0.9653846153846154
+0.8980392156862745
+Mean Accuracy: 0.94 (+/- 0.06)
+
+Total average accuracy across all environments: 
+0.94

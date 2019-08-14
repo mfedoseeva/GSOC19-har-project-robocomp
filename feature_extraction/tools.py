@@ -124,12 +124,6 @@ def horizontal_flip(X, valid_frame_num):
             X_flipped[i, 0, t, :] *= -1
     return X_flipped
 
-# def clip_samples_even(X, valid_frames_num):
-#     '''
-#     make sequnces the same length equal to the shortest sequence
-#     '''
-#     min_seq = min(valid_frames_num)
-#     return X[:, :, :min_seq, :], min_seq
 
 def diff_position_x(X, num_frames):
     '''
@@ -276,59 +270,5 @@ def flatten(features):
     return new_features
 
 
-def cos_dist(joint1, joint2, n_frames, valid_frame_num, V=2000):
-    '''
-    cosine distance of a joint relative to another joint
-    in_shape = (n_frames, 3)
-    out_shape = (N, n_frames)
-    '''
-    
-    res = np.zeros(n_frames)
-    for t in range(n_frames):
-        dot_prod = np.dot(joint1[t, :], joint2[t, :])
-        a = np.linalg.norm(joint1[t, :])
-        b = np.linalg.norm(joint2[t, :])
-        res[t] = dot_prod / (a * b)
-    out = np.zeros((len(valid_frame_num), V))
-    prev = 0   
-    for i, frames in enumerate(valid_frame_num):
-        out[i, :frames] = res[prev: prev + frames]
-        prev += frames
-    return out
-
-def cos_dist2(joint1, joint2, valid_frame_num):
-    '''
-    cosine distance of a joint relative to another joint
-    in_shape = (N, 3, T)
-    out_shape = (N, T)
-    '''   
-    N, _, T = joint1.shape
-    out = np.zeros((N, T))
-    for i in range(N):
-        for t in range(valid_frame_num[i]):
-            dot_prod = np.dot(joint1[i, :, t], joint2[i, :, t])
-            a = np.linalg.norm(joint1[i, :, t])
-            b = np.linalg.norm(joint2[i, :, t])
-            out[i, t] = dot_prod/(a * b)
-    return out
-
-# def cos_dist_totorso(joint1, torso_coords, valid_frame_num):
-#     '''
-#     cosine distance of a joint relative to torso, requires non-centered data for both joints
-#     in_shape = (N, 3, n_frames)
-#     out_shape = (N, 3, n_frames)
-#     '''
-    
-#     N, _, T = joint1.shape
-#     out = np.zeros((N, T))
-#     for i in range(N):
-#         for t in range(valid_frame_num[i]):
-#             dot_prod = np.dot(joint1[i, :, t], torso_coords[i, :, t])
-#             print(dot_prod)
-#             a = np.linalg.norm(joint1[i, :,t])
-#             b = np.linalg.norm(torso_coords[i, :, t])
-#             print(a*b)
-#             out[t] = dot_prod/(a * b)   
-#     return out
 
 

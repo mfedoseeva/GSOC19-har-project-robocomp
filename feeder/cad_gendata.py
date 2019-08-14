@@ -52,6 +52,7 @@ def end_toolbar():
 
 def gendata(data_path,
             out_path,
+            separated,
             part,
             env,
             ignored_sample_path=None,
@@ -65,7 +66,8 @@ def gendata(data_path,
     sample_label = []
     sample_data = []
 
-    # data_path = os.path.join(data_path, e)
+    if separated:
+        data_path = os.path.join(data_path, e)
     out_path = os.path.join(out_path, e)
 
     os.makedirs(out_path, exist_ok=True)
@@ -152,14 +154,22 @@ if __name__ == '__main__':
         # '--data_path', default='../../cad60_separated')
     parser.add_argument('--data_path', default='../../cad60dataset')
     parser.add_argument('--out_folder', default='../data0/CAD-60')
+    parser.add_argument('--envs', default='all', help='all or separated')
 
     # everything is train data, because we will be doing cross-validation, can extend this for train-test split simply by adding 'test' to the list
     part = ['train']
 
-    # environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
-    environments = ['all']
     arg = parser.parse_args()
 
+    separated = False
+
+    if arg.envs == 'separated':
+        environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
+        separated = True;
+    elif arg.envs == 'all':
+        environments = ['all']
+    else:
+        raise ValueError('unsupported option, choose either all or separated')
 
     for p in part:
         for e in environments:
@@ -169,5 +179,6 @@ if __name__ == '__main__':
             gendata(
                 arg.data_path,
                 out_path,
+                separated, 
                 part=p,
                 env=e)

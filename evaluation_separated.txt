@@ -1,0 +1,63 @@
+
+Environment: office
+sequence length: 120
+sampled frequency: 30
+Distribution of samples across label bins: 
+[1140. 1620. 1230.    0.    0.    0.    0.    0.    0.    0.    0. 1350.]
+Accuracy for each fold, i.e. subject
+0.9537414965986395
+1.0
+0.9178294573643411
+0.8156462585034013
+Mean Accuracy: 0.92 (+/- 0.14)
+
+Environment: livingroom
+sequence length: 120
+sampled frequency: 30
+Distribution of samples across label bins: 
+[1140.    0. 1230.    0.    0.    0. 1650. 1500.    0.    0.    0.    0.]
+Accuracy for each fold, i.e. subject
+0.9490196078431372
+1.0
+0.9940740740740741
+0.8474358974358974
+Mean Accuracy: 0.95 (+/- 0.12)
+
+Environment: kitchen
+sequence length: 120
+sampled frequency: 30
+Distribution of samples across label bins: 
+[   0.    0. 1230.    0.    0.    0.    0.    0. 1650. 1470.  720.    0.]
+Accuracy for each fold, i.e. subject
+0.9751937984496124
+0.8729729729729729
+0.9741666666666666
+0.8571428571428571
+Mean Accuracy: 0.92 (+/- 0.11)
+
+Environment: bedroom
+sequence length: 120
+sampled frequency: 30
+Distribution of samples across label bins: 
+[1140.    0. 1230.    0.    0.    0.    0.    0.    0.    0.  720.    0.]
+Accuracy for each fold, i.e. subject
+0.9053763440860215
+1.0
+0.9680555555555556
+0.5609195402298851
+Mean Accuracy: 0.86 (+/- 0.35)
+
+Environment: bathroom
+sequence length: 120
+sampled frequency: 30
+Distribution of samples across label bins: 
+[   0.    0.    0. 1590. 1530.  960.    0.    0.    0.    0.    0.    0.]
+Accuracy for each fold, i.e. subject
+0.9924731182795699
+1.0
+0.9729166666666667
+0.9675675675675676
+Mean Accuracy: 0.98 (+/- 0.03)
+
+Total average accuracy across all environments: 
+0.93

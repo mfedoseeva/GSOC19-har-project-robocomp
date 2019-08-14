@@ -1,15 +1,12 @@
 # sys
 import pickle
 
-# torch
-# import torch
-# import torch.utils.data
 
 import numpy as np
 import os
 
-class Feeder():
-    """ Feeder for skeleton-based action recognition
+class Dataset():
+    """ Dataset for skeleton-based action recognition
     Arguments:
         data_path: the path to '.npy' data, the shape of data should be (N, C, T, V)
         label_path: the path to label
@@ -20,14 +17,12 @@ class Feeder():
                  data_path,
                  label_path,
                  num_frame_path,
-                 #center=False,
-                 mmap=False,
+                 mmap = False,
                  max_body = 1
                  ):
         self.data_path = data_path
         self.label_path = label_path
         self.num_frame_path = num_frame_path
-        #self.center = center
         self.mmap = mmap
         self.max_body = max_body
 
@@ -68,40 +63,13 @@ class Feeder():
             raise NotImplementedError('multiperson not implemented')
 
 
-    def __len__(self):
-        return len(self.label)
-
-    def __iter__(self):
-        return self
-
-    def __getitem__(self, index):
-        # get data
-        # input: C, T, V
-        data_numpy = self.data[index]
-       
-        if self.mmap:
-            data_numpy = np.array(data_numpy) # convert numpy.core.memmap.memmap to numpy
-
-
-        label = self.label[index]
-        # valid_frame_num = self.valid_frame_num[index]
-
-        # if self.center == True:
-        #     for t in range(valid_frame_num):
-        #         # coords of the torso
-        #         torso_coord = data_numpy[:, t, 2]
-        #         for v in range(self.V):
-        #             data_numpy[:, t, v] -= torso_coord
-
-        return data_numpy, label
-
 
 
 if __name__ == '__main__':
 
     import numpy as np
 
-    # testing
+    # testing, works for separated environments. No need to run this, just if want to get more info about data
     base_path = "../data0/CAD-60"
     environments = ['bathroom', 'bedroom', 'kitchen', 'livingroom', 'office']
     data_file = "train_data.npy"
@@ -116,7 +84,7 @@ if __name__ == '__main__':
         label_path = os.path.join(base_path, env, label_file)
         num_frame_path = os.path.join(base_path, env, num_frame_file)
 
-        dataset = Feeder(data_path, label_path, num_frame_path,
+        dataset = Dataset(data_path, label_path, num_frame_path,
                          #center=False
                          )
 

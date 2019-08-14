@@ -4,7 +4,7 @@ import random
 import numpy as np
 from feature_extraction.feature_extractor_for_sequence import extract_features
 from feature_extraction.tools import *
-from feeder.feeder import Feeder
+from feeder.feeder import Dataset
 from feeder import utils
 from support_operations.plot_confusion_matrix import plot_confusion_matrix
 import pickle
@@ -14,14 +14,10 @@ from sklearn import svm
 from sklearn.model_selection import cross_val_score
 from sklearn.decomposition import PCA
 
-# for ensemble
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import VotingClassifier
+'''
+scikit-learn libabry version used in this code is 0.20.3
+'''
 
-# _ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
-_ENVIRONMENT = ['all']
 _SUBJECTS = 4
 _CLASS_NAMES = ['talking on the phone', 'writing on whiteboard', 'drinking water', 'rinsing mouth with water', 'brushing teeth', 'wearing contact lenses', 'talking on couch', 'relaxing on couch', 'cooking (chopping)', 'cooking (stirring)', 'opening pill container', 'working on computer']
 _SEQ_LENGTH = 120
@@ -32,17 +28,19 @@ parser.add_argument('--dataset_dir', default='./data0/', help="directory of the 
 
 # HERE it is decided which dataset will be used
 parser.add_argument('--dataset_name', default='CAD-60', help="dataset name ")
-# this parameter controls if only cv accuracy is output or the model is fit and confusion matrices saved
-parser.add_argument('--evaluation', default='cv', help='cv or full')
+# train on groups of environments or for all 12 classes
+parser.add_argument('--envs', default='all', help="all or separated")
+# this parameter controls if only cv accuracy is output or the confusion matrices are saved or the model is trained on all data and saved
+parser.add_argument('--run', default='cv', help='cv or confusion or final_model')
 
 
 def fetch_data(params):
-    # creates and returns feeder object with data
+    # creates and returns Dataset object with data
     if 'CAD-60' in params.dataset_name:
         params.data_feeder_args["data_path"] = params.dataset_dir+'/CAD-60'+ '/' + params.environment + '/train_data.npy'
         params.data_feeder_args["num_frame_path"] = params.dataset_dir+'/CAD-60' + '/' + params.environment +'/train_num_frame.npy'
         params.data_feeder_args["label_path"] = params.dataset_dir + '/CAD-60' + '/' + params.environment + '/train_label.pkl'
-        dataset = Feeder(**params.data_feeder_args)
+        dataset = Dataset(**params.data_feeder_args)
         return dataset
     else:
         raise NotImplementedError('only CAD-60 is supported')
@@ -94,8 +92,9 @@ def save_model(clf, environment):
     os.makedirs('./models', exist_ok=True)
     with open('./models/{}_final_model.pkl'.format(environment), 'wb') as f:
         pickle.dump(clf, f)
+    print('Model saved!')
 
-def print_distribution(labels, total_classes=12):
+def print_distribution(labels, env_classified, total_classes=12):
     # print classes distribution
     print('Distribution of samples across label bins: ')
     oneh_vector = np.zeros(12)
@@ -105,17 +104,8 @@ def print_distribution(labels, total_classes=12):
     print(oneh_vector)
     env_classified.append(len(labels))
 
-if __name__ == '__main__':
-    # Load the parameters from json file
-    args = parser.parse_args()
-
-    params = utils.Params()
-
-    params.dataset_dir = args.dataset_dir
-    params.evaluation = args.evaluation
-    # HERE dataset name is saved from the parser
-    params.dataset_name = args.dataset_name
-
+def main(params):
+    
     # Set the random seed for reproducible experiments
     np.random.seed(0)
     random.seed(0)
@@ -123,10 +113,16 @@ if __name__ == '__main__':
     env_classified = []
     total_acc = []
 
+    if params.envs == 'separated':
+        _ENVIRONMENT = ['office', 'livingroom', 'kitchen', 'bedroom', 'bathroom']
+    elif params.envs == 'all':
+        _ENVIRONMENT = ['all']
+    else:
+        raise ValueError('unsupported option, choose either all or separated')
+
     for env in _ENVIRONMENT:
 
         print('')
-
         params.environment = env
         print(f'Environment: {params.environment}')
 
@@ -135,7 +131,6 @@ if __name__ == '__main__':
         X = dataset.data
         Y = dataset.label
         num_frames = dataset.valid_frame_num
-
 
         X = center(X, num_frames)
 
@@ -152,18 +147,19 @@ if __name__ == '__main__':
         print(f'sequence length: {_SEQ_LENGTH}')
         print(f'sampled frequency: {_SAMPLED_FREQ}')
 
-        print('training data shape: ')
-        print(X.shape)
-
-        print_distribution(Y)
+        print_distribution(Y, env_classified)
         
-
         X = np.vstack((X, X_augm))
         Y = np.concatenate((Y, Y), axis=None)
 
         clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
 
-        if params.evaluation == 'cv' or 'full':
+        if params.run == 'final_model':
+            # train on all data and save persist the model
+            clf.fit(X, Y)
+            save_model(clf, env)
+            continue
+        if params.run == 'cv' or 'confusion':
             # runs cross validation and outputs accuracy
             custom_cv = custom_cv_subj(new_samples_num, augm=True)
             scores = cross_val_score(clf, X, Y, cv=custom_cv, n_jobs=-1)
@@ -172,7 +168,7 @@ if __name__ == '__main__':
                 print(scores[i])
             print("Mean Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
             total_acc.append(scores.mean())
-        if params.evaluation == 'full':
+        if params.run == 'confusion':
             # produces confusion matrices
             pred_labels = np.empty(int(len(Y)/2), dtype=int)
             correct_labels = np.empty(int(len(Y)/2), dtype=int)
@@ -191,7 +187,24 @@ if __name__ == '__main__':
                 prev = prev + pred_len
             np.set_printoptions(precision=2)
             plot_confusion_matrix(correct_labels, pred_labels, classes=np.array(_CLASS_NAMES), normalize=True, title=env)
+    if (params.run == 'final_model'):
+        return
     print('')
     print('Total average accuracy across all environments: ')
     print(total_mean_acc(env_classified, total_acc))
+
+if __name__ == '__main__':
+
+    # parse the parameters
+    args = parser.parse_args()
+
+    params = utils.Params()
+
+    params.dataset_dir = args.dataset_dir
+    params.run = args.run
+    params.dataset_name = args.dataset_name
+    params.envs = args.envs
+
+    main(params)
+
 
