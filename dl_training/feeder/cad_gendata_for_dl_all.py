@@ -18,9 +18,9 @@ _num_joint = 15
 _max_frame = 2000
 _toolbar_width = 30
 # length for cut sequnces
-_cut_frames = 130
-_overlap = 30
-# hyperparam of the NN, should agree with params.json of NN training
+_cut_frames = 100
+_overlap = 50
+# hyperparam of the NN, should agree with params.json of NN training if used
 _window_size = 32
 
 
@@ -133,18 +133,18 @@ def gendata(data_path,
 
     # do not flip on this level, flipping will be done randomly during training in the feeder
     # if part == 'train':
-        # we will double the training data by using the flipped skeletons
-        # flipped_data = horizontal_flip(data, valid_frame_num)
-        # total_data = np.zeros((data.shape[0]*2, 3, _max_frame, _num_joint))
-        # total_data[: data.shape[0], :, :, :] = data
-        # total_data[data.shape[0]:, :, :, :] = flipped_data
-        # data = total_data
-        # valid_frame_num = valid_frame_num * 2
-        # sample_name = sample_name*2
-        # sample_label = sample_label*2
-    cut_sequence, new_samples_num = cut_samples_len(data, valid_frame_num, _cut_frames, _overlap)
-    samples, new_samples_num = samples_from_cut_sequence(cut_sequence, new_samples_num, _window_size)
-    names, labels = names_labels_for_cut_samples(sample_name, sample_label, new_samples_num)
+    #     # we will double the training data by using the flipped skeletons
+    #     flipped_data = horizontal_flip(data, valid_frame_num)
+    #     total_data = np.zeros((data.shape[0]*2, 3, _max_frame, _num_joint))
+    #     total_data[: data.shape[0], :, :, :] = data
+    #     total_data[data.shape[0]:, :, :, :] = flipped_data
+    #     data = total_data
+    #     valid_frame_num = valid_frame_num * 2
+    #     sample_name = sample_name*2
+    #     sample_label = sample_label*2
+    samples, new_samples_num = cut_samples_len(data, valid_frame_num, _cut_frames, _overlap)
+    samples, new_samples_num = samples_from_cut_sequence(samples, new_samples_num, _window_size)
+    names, labels = names_labels_for_cut_samples(samples, sample_label, new_samples_num)
     valid_frame_num = [_window_size] * len(names)
     save_data(part, out_path, labels, names, samples, valid_frame_num)
     print(f'training on: {training_subjects}')

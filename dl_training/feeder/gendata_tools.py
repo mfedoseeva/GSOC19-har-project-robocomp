@@ -67,14 +67,16 @@ def samples_from_cut_sequence(X, new_samples_num, window_size):
     freq = T//window_size
     idx = []
     for i in range(freq):
-        idx.append([x + i for x in range(T//freq*freq) if x%freq == 0])
+        if (i + 1) % 2 == 0:
+            continue
+        idx.append([x + i for x in range(window_size*freq) if x%freq == 0])
     
-    X_reduced = np.zeros((N*freq, C, window_size, V))
+    X_reduced = np.zeros((N*len(idx), C, window_size, V))
     for i in range(N):
-        for j in range(freq):
+        for j in range(len(idx)):
             for k, ind in enumerate(idx[j]):
-                X_reduced[i*freq + j, :, k, :] = X[i, :, ind, :]
-    new_samples_num = [x * freq for x in new_samples_num]
+                X_reduced[i*len(idx) + j, :, k, :] = X[i, :, ind, :]
+    new_samples_num = [x * len(idx) for x in new_samples_num]
     print('num samples after sampling')
     print(new_samples_num)
     print(f'total samples: {sum(new_samples_num)}')
