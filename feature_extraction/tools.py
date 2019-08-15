@@ -1,6 +1,7 @@
 import numpy as np
 # for standardization
 from sklearn.preprocessing import StandardScaler
+import pickle
 
 def standardize(X):
     '''
@@ -30,12 +31,17 @@ def normalize_allsamples(X):
     '''
     N, feat = X.shape
     out = np.zeros((N, feat))
+    denoms = []
     for i in range(feat):
         denom = np.max(X[:, i]) - np.min(X[:, i])
         if denom == 0:
-            out[:, i] = X[:, i] / X.shape[0]
+            denom = X.shape[0]
+            out[:, i] = X[:, i] / denom
         else:    
             out[:, i] = X[:, i] * (1/denom)
+        denoms.append(denom)
+    # with open('normalization_denoms.pkl', 'wb') as f:
+    #     pickle.dump(denoms, f)
     return out
 
 def normalize_allsamples_byjoint(X):

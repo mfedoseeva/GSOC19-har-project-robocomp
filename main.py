@@ -148,9 +148,10 @@ def main(params):
         print_distribution(Y, env_classified)
         
         X = np.vstack((X, X_augm))
+
         Y = np.concatenate((Y, Y), axis=None)
 
-        clf = svm.SVC(decision_function_shape='ovo', gamma='scale')
+        clf = svm.SVC(decision_function_shape='ovo', gamma='scale', probability=True)
 
         if params.run == 'final_model':
             # train on all data and save persist the model

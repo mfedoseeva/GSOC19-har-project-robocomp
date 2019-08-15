@@ -27,7 +27,7 @@ def extract_features(X, labels, num_frames, seq_length=75, sampled_freq=5):
 
     # dist between two hands 11, 12 and torso
     features[:, 0, :] = tools.dist_to_joint_allsamples(X[:, :, :, 11], X[:, :, :, 2], num_frames)
-    features[:, 2, :] = tools.dist_to_joint_allsamples(X[:, :, :, 12], X[:, :, :, 2], num_frames)
+    features[:, 1, :] = tools.dist_to_joint_allsamples(X[:, :, :, 12], X[:, :, :, 2], num_frames)
     # dist between elbows and torso
     features[:, 2, :] = tools.dist_to_joint_allsamples(X[:, :, :, 4], X[:, :, :, 2], num_frames)
     features[:, 3, :] = tools.dist_to_joint_allsamples(X[:, :, :, 6], X[:, :, :, 2], num_frames)

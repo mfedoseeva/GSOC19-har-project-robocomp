@@ -42,7 +42,7 @@ class Dataset():
                     self.sample_name, self.label = pickle.load(
                         f, encoding='latin1')
         else:
-            raise ValueError()
+            raise ValueError('labels should be pickled')
 
         # load data
         if self.mmap == True:
