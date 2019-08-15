@@ -12,8 +12,6 @@ import pickle
 # for SVM
 from sklearn import svm
 from sklearn.model_selection import cross_val_score
-from sklearn.decomposition import PCA
-
 '''
 scikit-learn libabry version used in this code is 0.20.3
 '''
