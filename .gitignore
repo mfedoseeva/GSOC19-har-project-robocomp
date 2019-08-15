@@ -18,7 +18,7 @@ total_labels.txt
 #
 
 /evaluation.txt
-/models
+#/models
 /history
 /dl_training/feeder/feeder.py
 	
