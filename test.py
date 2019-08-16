@@ -15,8 +15,8 @@ if __name__ == '__main__':
 
     X = dataset.data
     Y = dataset.label
-    x = X[10, :, :, :]
-    y = Y[10]
+    x = X[16, :, :, :]
+    y = Y[16]
     idx = [1, 30, 60, 90]
     x = x[:, idx, :]
     np.save('test_sample', x)
