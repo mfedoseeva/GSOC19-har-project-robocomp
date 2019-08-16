@@ -24,9 +24,9 @@ def plot_confusion_matrix(y_true, y_pred, classes, title,
     Normalization can be applied by setting `normalize=True`.
     """
     if normalize:
-      title = f'Normalized confusion matrix for {title}'
+      title = 'Normalized confusion matrix for ' + title
     else:
-      title = f'Confusion matrix, without normalization for {title}'
+      title = 'Confusion matrix, without normalization for ' + title
 
     # Compute confusion matrix
     cm = confusion_matrix(y_true, y_pred)
@@ -71,8 +71,8 @@ def plot_confusion_matrix(y_true, y_pred, classes, title,
                     color="white" if cm[i, j] > thresh else "black")
     fig.tight_layout()
 
-    plt.savefig(f'{title}.png')
-    print(f'confusion matrix for {title} has been saved in the current directory')
+    plt.savefig(title + '.png')
+    print('confusion matrix for ' + title + ' has been saved in the current directory')
     return ax
 
 

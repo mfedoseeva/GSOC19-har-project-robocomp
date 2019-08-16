@@ -13,7 +13,7 @@ cd feeder
 
 1. run cad_gendata to save skeletons from txt to python structures
 ```commandline
-python cad_gendata.py --data_path your-path-to-cad-60-dataset(separated!)
+python cad_gendata.py --data_path your-path-to-cad-60-dataset(full or separated by environments)
 ```
 
 example on my computer:

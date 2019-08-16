@@ -1,14 +1,6 @@
 import numpy as np
-# for standardization
-from sklearn.preprocessing import StandardScaler
 import pickle
 
-def standardize(X):
-    '''
-    in_shape = (N, n_features)
-    '''
-    scaler = StandardScaler()
-    return scaler.fit(X).transform(X)
 
 def normalize(X, valid_frame_num):
     '''

@@ -1,5 +1,5 @@
 # Requirements
-python3  
+python (works with both python 2 and python 3)
 numpy  
 scikit-learn  
 matplotlib
@@ -48,24 +48,24 @@ The default run only delivers the accuracy for the cross-validation without conf
 the full command to run main.py with all parameters is:
 
 ```commandline
-python main.py --dataset-dir data-folder --dataset_name dataset-name --envs environment-option --evalution evaluation-type
+python main.py --dataset-dir data-folder --dataset_name dataset-name --envs environment-option --run run-option
 ```
 
 the default arguments are:
 
 ```commandline
-python main.py --dataset-dir ./data0 --dataset_name CAD-60 --envs all --evalution cv
+python main.py --dataset-dir ./data0 --dataset_name CAD-60 --envs all --run cv
 ```
 
 if you want to produce confusion matrices or save the model, run main.py as follows:
 
 ```commandline
-python main.py --evaluation confusion
+python main.py --run confusion
 ```
 or
 
 ```commandline
-python main.py --evaluation final_model
+python main.py --run final_model
 ```
 
 the last option trains on all data and saves the model to /models directory

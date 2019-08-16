@@ -70,7 +70,8 @@ def gendata(data_path,
         data_path = os.path.join(data_path, e)
     out_path = os.path.join(out_path, e)
 
-    os.makedirs(out_path, exist_ok=True)
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
     print(data_path)
     print(out_path)
 

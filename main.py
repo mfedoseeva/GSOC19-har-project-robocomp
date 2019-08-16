@@ -87,7 +87,8 @@ def total_mean_acc(env_classified, total_acc):
     return np.around(acc, decimals=2)
 
 def save_model(clf, environment):
-    os.makedirs('./models', exist_ok=True)
+    if not os.path.exists('./models'):
+        os.makedirs('./models')
     with open('./models/{}_final_model.pkl'.format(environment), 'wb') as f:
         pickle.dump(clf, f)
     print('Model saved!')
@@ -122,7 +123,7 @@ def main(params):
 
         print('')
         params.environment = env
-        print(f'Environment: {params.environment}')
+        print('Environment: ' + params.environment)
 
         # get the data
         dataset = fetch_data(params)
@@ -142,8 +143,8 @@ def main(params):
         X_augm, _, _ = extract_features(X_augm, Y_orig, num_frames, seq_length=_SEQ_LENGTH, sampled_freq=_SAMPLED_FREQ)
         X_augm = normalize_allsamples(X_augm)
 
-        print(f'sequence length: {_SEQ_LENGTH}')
-        print(f'sampled frequency: {_SAMPLED_FREQ}')
+        print('sequence length: ' + str(_SEQ_LENGTH))
+        print('sampled frequency: ' + str(_SAMPLED_FREQ))
 
         print_distribution(Y, env_classified)
         

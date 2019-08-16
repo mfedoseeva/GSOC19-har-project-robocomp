@@ -1,7 +1,6 @@
 # sys
 import pickle
 
-
 import numpy as np
 import os
 
@@ -33,16 +32,8 @@ class Dataset():
 
         # load label
         if '.pkl' in self.label_path:
-            try:
-                with open(self.label_path) as f:
-                    self.sample_name, self.label = pickle.load(f)
-            except:
-                # for pickle file from python2
-                with open(self.label_path, 'rb') as f:
-                    self.sample_name, self.label = pickle.load(
-                        f, encoding='latin1')
-        else:
-            raise ValueError('labels should be pickled')
+            with open(self.label_path, 'rb') as f:
+                self.sample_name, self.label = pickle.load(f)
 
         # load data
         if self.mmap == True:
@@ -78,7 +69,7 @@ if __name__ == '__main__':
     
     for env in environments:
 
-        print(f"Environment: {env}")
+        print("Environment: " +  env)
 
         data_path = os.path.join(base_path, env, data_file)
         label_path = os.path.join(base_path, env, label_file)
@@ -103,10 +94,10 @@ if __name__ == '__main__':
         print(dataset.valid_frame_num)
 
         print('Samples statistics: ')
-        print(f"{dataset.N} samples")
-        print(f"{dataset.C} coords")
-        print(f"{np.mean(dataset.valid_frame_num):.2f} average frames") 
-        print(f"{dataset.V} joints")
+        print(str(dataset.N) + ' samples')
+        print(str(dataset.C) + ' coords')
+        print(str(np.mean(dataset.valid_frame_num)) +  ' average frames') 
+        print(str(dataset.V) + ' joints')
 
         print ('------------------')
 
