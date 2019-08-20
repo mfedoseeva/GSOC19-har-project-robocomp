@@ -1,0 +1,50 @@
+
+Environment: office
+Distribution of samples across label bins: 
+[4951. 6818. 5204.    0.    0.    0.    0.    0.    0.    0.    0. 5679.]
+Accuracy for each fold, i.e. subject
+0.5017020586804992
+0.39225130890052357
+0.42052796750969174
+0.5278969957081545
+Mean Accuracy: 0.46 (+/- 0.11)
+
+Environment: livingroom
+Distribution of samples across label bins: 
+[4951.    0. 5204.    0.    0.    0. 6744. 6176.    0.    0.    0.    0.]
+Accuracy for each fold, i.e. subject
+0.35993589743589743
+0.617786391042205
+0.5324310072068905
+0.3580436788680406
+Mean Accuracy: 0.47 (+/- 0.22)
+
+Environment: kitchen
+Distribution of samples across label bins: 
+[   0.    0. 5204.    0.    0.    0.    0.    0. 6893. 5997. 3345.    0.]
+Accuracy for each fold, i.e. subject
+0.5210596531351248
+0.5374421539755995
+0.36471273291925466
+0.5475660197263761
+Mean Accuracy: 0.49 (+/- 0.15)
+
+Environment: bedroom
+Distribution of samples across label bins: 
+[4951.    0. 5204.    0.    0.    0.    0.    0.    0.    0. 3345.    0.]
+Accuracy for each fold, i.e. subject
+0.6961926961926962
+0.735511474134578
+0.3336439888164026
+0.5952195375422188
+Mean Accuracy: 0.59 (+/- 0.31)
+
+Environment: bathroom
+Distribution of samples across label bins: 
+[   0.    0.    0. 6560. 6389. 4172.    0.    0.    0.    0.    0.    0.]
+Accuracy for each fold, i.e. subject
+0.7978128179043744
+0.6192680776014109
+0.6100292112950341
+0.41672167216721673
+Mean Accuracy: 0.61 (+/- 0.27)

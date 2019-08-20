@@ -16,8 +16,9 @@ total_labels.txt
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 #
+/test.py
 
-/evaluation.txt
+# /evaluation.txt
 #/models
 /history
 /dl_training/feeder/feeder.py

@@ -31,7 +31,7 @@ class Dataset():
         # data: N C V T 
 
         # load label
-        if '.pkl' in self.label_path:
+        if '.pkl' in self.label_path:   
             with open(self.label_path, 'rb') as f:
                 self.sample_name, self.label = pickle.load(f)
 
