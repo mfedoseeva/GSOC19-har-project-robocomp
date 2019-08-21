@@ -12,7 +12,7 @@
 Untitled*.ipynb
 total_labels.txt
 
-*.png
+# *.png
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 #
