@@ -8,7 +8,7 @@ import glob
 from gendata_tools import *
 import sys
 # we will reuse the cad_read_skeleton file from SVM training here
-sys.path.append('../../feeder')
+sys.path.append('../../SVM_hand_crafted/feeder')
 from cad_read_skeleton import read_xyz
 
 _subjects = 4
@@ -131,9 +131,9 @@ def gendata(data_path,
     print(valid_frame_num)
     print(f'total samples: {len(valid_frame_num)}')
 
+    # below code is for augmentation by flipping which increases the number of training samples
     # do not flip on this level, flipping will be done randomly during training in the feeder
     # if part == 'train':
-    #     # we will double the training data by using the flipped skeletons
     #     flipped_data = horizontal_flip(data, valid_frame_num)
     #     total_data = np.zeros((data.shape[0]*2, 3, _max_frame, _num_joint))
     #     total_data[: data.shape[0], :, :, :] = data
