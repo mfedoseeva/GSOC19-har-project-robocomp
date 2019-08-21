@@ -2,7 +2,7 @@
 
 This repository provides the code for training the models for Human Activity Recognition Component for Robocomp.  
 Code for the components themselves has been done in the Robocomp's forks, these are the pull requests:  
-[Interfaces](https://github.com/robocomp/robocomp/pull/224)
+[Interfaces](https://github.com/robocomp/robocomp/pull/224)  
 [Components](https://github.com/robocomp/robocomp-robolab/pull/28)  
 
 # Content
