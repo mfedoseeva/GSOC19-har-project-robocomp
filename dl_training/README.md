@@ -89,7 +89,8 @@ python main.py --dataset_dir data0 --mode load_train --load True --model_name HC
 
 transfer_learning.txt contains information about the accuracies achieved for CAD-60. Confusion matrices and loss figures are below.
 
-![Confusion matrices](confusion.png)
+![Confusion matrices](confusion.png)  
+
 ![Losses](losses.png)
 
 

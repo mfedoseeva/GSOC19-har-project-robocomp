@@ -20,7 +20,10 @@ This repository consists of the:
 
 # Use
 
-Both of the training related directories have their own detailed READMEs. Please check those out. 
+Both of the training related directories have their own detailed READMEs.  
+[Deep learning training](https://github.com/mfedoseeva/GSOC19-har-project-robocomp/blob/master/dl_training/README.md)  
+[SVM training](https://github.com/mfedoseeva/GSOC19-har-project-robocomp/blob/master/SVM_hand_crafted/README.md)   
+Each of the components also has its own README on installation and use.
 
 # Details
 
