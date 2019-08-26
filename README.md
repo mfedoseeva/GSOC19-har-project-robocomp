@@ -34,11 +34,11 @@ Details about the development of the project are described in the blog posts:
 [First classification attempts](https://robocomp.github.io/web/gsoc/2019/mariyam_fedoseeva/post02)  
 [Improvement of the classification](https://robocomp.github.io/web/gsoc/2019/mariyam_fedoseeva/post03)  
 [Transfer learning and CNN](https://robocomp.github.io/web/gsoc/2019/mariyam_fedoseeva/post04)  
-[Creation of the Components]
+[Creation of the Components](https://robocomp.github.io/web/gsoc/2019/mariyam_fedoseeva/post05)
 
 # Results and Future work
 
-Two models have been trained with the maximum accuracy achieved of 94% on the CAD-60 dataset. A group of components described in the [Creation of the Components] have been developed to implement the full pipeline to process and classify data from raw rgb camera input.  
+Two models have been trained with the maximum accuracy achieved of 94% on the CAD-60 dataset. A group of components described in the [Creation of the Components](https://robocomp.github.io/web/gsoc/2019/mariyam_fedoseeva/post05) has been developed to implement the full pipeline to process and classify data from raw rgb camera input.  
 However, despite the good accuracy achieved on the dataset's data, the model's performance is unsatisfactory on real-life input. Future work could focus on making the classifier more robust and general. 
 
 
