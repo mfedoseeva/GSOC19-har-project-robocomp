@@ -1,3 +1,4 @@
+#encoding: utf-8
 """
 code credits
 https://github.com/cs230-stanford/cs230-stanford.github.io

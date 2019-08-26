@@ -21,6 +21,7 @@ test_samples.npy
 #/models
 /SVM_hand_crafted/history
 /dl_training/feeder/feeder.py
+/dl_training/test.py
 	
 data0
 ### Python ###
