@@ -6,21 +6,20 @@
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 # ignore jup notebooks as well
-/test.ipynb
-/support_operations/data_separation.ipynb
-/feature_extraction/testing_features1.ipynb
+test*.ipynb
 Untitled*.ipynb
 total_labels.txt
 
+test_samples.npy
 # *.png
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 #
-/test.py
+/SVM_hand_crafted/test_2.py
 
 # /evaluation.txt
 #/models
-/history
+/SVM_hand_crafted/history
 /dl_training/feeder/feeder.py
 	
 data0

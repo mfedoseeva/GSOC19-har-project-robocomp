@@ -1,4 +1,6 @@
 from feeder.feeder import Dataset
+import sys
+sys.path.insert(0, '../')
 from component_code.inference import predict_sample
 from feeder import utils
 import numpy as np
@@ -7,7 +9,7 @@ from shutil import copy2
 
 _CLASS_NAMES = ['talking on the phone', 'writing on whiteboard', 'drinking water', 'rinsing mouth with water', 'brushing teeth', 'wearing contact lenses',
  'talking on couch', 'relaxing on couch', 'cooking (chopping)', 'cooking (stirring)', 'opening pill container', 'working on computer']
-data_path = '../cad60dataset'
+data_path = '../../cad60dataset'
 
 if __name__ == '__main__':
     params = utils.Params()
@@ -31,7 +33,7 @@ if __name__ == '__main__':
     print(data_path)
     sample_path = data_path + names[num].split('.')[0]
     print(sample_path)
-    copy_dir = '../test_sample_pics'
+    copy_dir = '../../test_sample_pics'
     if not os.path.exists(copy_dir):
         os.makedirs(copy_dir)
     for i in idx:
